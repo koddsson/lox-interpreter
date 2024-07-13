@@ -145,7 +145,7 @@ fn main() -> ExitCode {
                         });
                     }
                     Err(err) => {
-                        println!("{}", err);
+                        eprintln!("{}", err);
                         result = 65;
                     }
                 }
