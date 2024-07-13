@@ -54,46 +54,42 @@ enum TokenType {
     EOF,
 }
 
-#[derive(Debug)]
 struct Token {
-    token_type: Option<TokenType>,
+    token_type: TokenType,
     lexeme: char,
-    literal: Option<String>,
+    literal: String,
     line: usize,
 }
 
 impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        if self.lexeme != ' ' {
-            write!(
-                f,
-                "{:?} {} {:?}",
-                self.token_type, self.lexeme, self.literal,
-            )
-        } else {
-            write!(f, "{:?}  {:?}", self.token_type, self.literal)
-        }
+        write!(f, "{:?} {} {}", self.token_type, self.lexeme, self.literal)
     }
 }
 
-fn scan_token(c: char) -> Option<TokenType> {
-    match c {
-        '(' => Some(TokenType::LEFT_PAREN),
-        ')' => Some(TokenType::RIGHT_PAREN),
-        '{' => Some(TokenType::LEFT_BRACE),
-        '}' => Some(TokenType::RIGHT_BRACE),
-        ',' => Some(TokenType::COMMA),
-        '.' => Some(TokenType::DOT),
-        '-' => Some(TokenType::MINUS),
-        '+' => Some(TokenType::PLUS),
-        ';' => Some(TokenType::SEMICOLON),
-        '*' => Some(TokenType::STAR),
-        _ => {
-            println!("[line 1] Error: Unexpected character: {}", c);
-            None
-        }
+struct UnexpectedTokenError {
+    line: usize,
+    token: char,
+}
+
+impl fmt::Display for UnexpectedTokenError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "[line {}] Error: Unexpected character: {}",
+            self.line, self.token
+        )
     }
 }
+
+/*
+[line 1] Error: Unexpected character: $
+[line 1] Error: Unexpected character: #
+COMMA , null
+DOT . null
+LEFT_PAREN ( null
+EOF  null
+*/
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -112,23 +108,58 @@ fn main() {
                 String::new()
             });
 
-            let tokens = file_contents.chars().map(|c| {
-                let token_type = scan_token(c);
-
-                Token {
-                    token_type,
-                    lexeme: c,
-                    literal: Some(c.to_string()),
-                    line: 1,
+            fn scan_token(line: usize, token: char) -> Result<TokenType, UnexpectedTokenError> {
+                match token {
+                    '(' => Ok(TokenType::LEFT_PAREN),
+                    ')' => Ok(TokenType::RIGHT_PAREN),
+                    '{' => Ok(TokenType::LEFT_BRACE),
+                    '}' => Ok(TokenType::RIGHT_BRACE),
+                    ',' => Ok(TokenType::COMMA),
+                    '.' => Ok(TokenType::DOT),
+                    '-' => Ok(TokenType::MINUS),
+                    '+' => Ok(TokenType::PLUS),
+                    ';' => Ok(TokenType::SEMICOLON),
+                    '*' => Ok(TokenType::STAR),
+                    _ => Err(UnexpectedTokenError { line, token }),
                 }
-            });
+            }
 
-            for token in tokens {
-                if token.token_type.is_none() {
+            let mut tokens: Vec<Token> = Vec::new();
+            let mut line = 1;
+
+            for c in file_contents.chars() {
+                if c == '\n' {
+                    line += 1;
                     continue;
                 }
-                println!("{:?}", token);
+                match scan_token(line, c) {
+                    Ok(token_type) => {
+                        tokens.push(Token {
+                            token_type,
+                            lexeme: c,
+                            literal: String::from("null"),
+                            line,
+                        });
+                    }
+                    Err(err) => {
+                        println!("{}", err);
+                    }
+                }
             }
+
+            for token in tokens {
+                println!("{}", token);
+            }
+
+            println!(
+                "{}",
+                Token {
+                    token_type: TokenType::EOF,
+                    lexeme: ' ',
+                    literal: String::from("null"),
+                    line
+                }
+            )
         }
         _ => {
             writeln!(io::stderr(), "Unknown command: {}", command).unwrap();
