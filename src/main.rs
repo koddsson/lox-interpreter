@@ -54,63 +54,45 @@ enum TokenType {
     EOF,
 }
 
+#[derive(Debug)]
 struct Token {
-    token_type: TokenType,
+    token_type: Option<TokenType>,
     lexeme: char,
-    literal: String,
-    line: u32,
+    literal: Option<String>,
+    line: usize,
 }
 
 impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         if self.lexeme != ' ' {
-            write!(f, "{:?} {} {}", self.token_type, self.lexeme, self.literal)
+            write!(
+                f,
+                "{:?} {} {:?}",
+                self.token_type, self.lexeme, self.literal,
+            )
         } else {
-            write!(f, "{:?}  {}", self.token_type, self.literal)
+            write!(f, "{:?}  {:?}", self.token_type, self.literal)
         }
     }
 }
 
-fn scan_token(c: char) -> TokenType {
+fn scan_token(c: char) -> Option<TokenType> {
     match c {
-        '(' => TokenType::LEFT_PAREN,
-        ')' => TokenType::RIGHT_PAREN,
-        '{' => TokenType::LEFT_BRACE,
-        '}' => TokenType::RIGHT_BRACE,
-        ',' => TokenType::COMMA,
-        '.' => TokenType::DOT,
-        '-' => TokenType::MINUS,
-        '+' => TokenType::PLUS,
-        ';' => TokenType::SEMICOLON,
-        '*' => TokenType::STAR,
-        _ => todo!("{}", c),
+        '(' => Some(TokenType::LEFT_PAREN),
+        ')' => Some(TokenType::RIGHT_PAREN),
+        '{' => Some(TokenType::LEFT_BRACE),
+        '}' => Some(TokenType::RIGHT_BRACE),
+        ',' => Some(TokenType::COMMA),
+        '.' => Some(TokenType::DOT),
+        '-' => Some(TokenType::MINUS),
+        '+' => Some(TokenType::PLUS),
+        ';' => Some(TokenType::SEMICOLON),
+        '*' => Some(TokenType::STAR),
+        _ => {
+            println!("[line 1] Error: Unexpected character: {}", c);
+            None
+        }
     }
-}
-
-fn scan_tokens<'a>(program: String) -> Vec<Token> {
-    let mut tokens: Vec<Token> = Vec::new();
-
-    for char in program.chars() {
-        if char == '\n' {
-            continue;
-        };
-        let token = Token {
-            token_type: scan_token(char),
-            lexeme: char,
-            literal: String::from("null"),
-            line: 1,
-        };
-        tokens.push(token);
-    }
-
-    tokens.push(Token {
-        token_type: TokenType::EOF,
-        lexeme: ' ',
-        literal: String::from("null"),
-        line: 1,
-    });
-
-    return tokens;
 }
 
 fn main() {
@@ -130,8 +112,22 @@ fn main() {
                 String::new()
             });
 
-            for token in scan_tokens(file_contents) {
-                println!("{}", token);
+            let tokens = file_contents.chars().map(|c| {
+                let token_type = scan_token(c);
+
+                Token {
+                    token_type,
+                    lexeme: c,
+                    literal: Some(c.to_string()),
+                    line: 1,
+                }
+            });
+
+            for token in tokens {
+                if token.token_type.is_none() {
+                    continue;
+                }
+                println!("{:?}", token);
             }
         }
         _ => {
