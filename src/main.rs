@@ -151,15 +151,7 @@ fn main() {
                 println!("{}", token);
             }
 
-            println!(
-                "{}",
-                Token {
-                    token_type: TokenType::EOF,
-                    lexeme: ' ',
-                    literal: String::from("null"),
-                    line
-                }
-            )
+            println!("EOF  null",)
         }
         _ => {
             writeln!(io::stderr(), "Unknown command: {}", command).unwrap();
