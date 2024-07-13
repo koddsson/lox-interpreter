@@ -2,6 +2,7 @@ use std::env;
 use std::fmt;
 use std::fs;
 use std::io::{self, Write};
+use std::process::ExitCode;
 
 #[derive(Debug)]
 enum TokenType {
@@ -91,15 +92,17 @@ LEFT_PAREN ( null
 EOF  null
 */
 
-fn main() {
+fn main() -> ExitCode {
     let args: Vec<String> = env::args().collect();
     if args.len() < 3 {
         writeln!(io::stderr(), "Usage: {} tokenize <filename>", args[0]).unwrap();
-        return;
+        return ExitCode::FAILURE;
     }
 
     let command = &args[1];
     let filename = &args[2];
+
+    let mut result = 0;
 
     match command.as_str() {
         "tokenize" => {
@@ -143,6 +146,7 @@ fn main() {
                     }
                     Err(err) => {
                         println!("{}", err);
+                        result = 65;
                     }
                 }
             }
@@ -151,11 +155,13 @@ fn main() {
                 println!("{}", token);
             }
 
-            println!("EOF  null",)
+            println!("EOF  null");
+
+            return ExitCode::from(result);
         }
         _ => {
             writeln!(io::stderr(), "Unknown command: {}", command).unwrap();
-            return;
+            return ExitCode::FAILURE;
         }
     }
 }
