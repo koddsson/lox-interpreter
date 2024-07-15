@@ -89,7 +89,7 @@ impl Scanner {
         }
 
         if self.is_at_end() {
-            eprintln!("[line {}] Unterminated string.", self.line - 1);
+            eprintln!("[line {}] Unterminated string.", self.line);
             return;
         }
 
