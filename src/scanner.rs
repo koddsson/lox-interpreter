@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::token::token::Token;
 use crate::token::token_type::TokenType;
 
@@ -8,6 +10,7 @@ pub struct Scanner {
     pub start: usize,
     pub tokens: Vec<Token>,
     pub exit_code: u8,
+    pub keywords: HashMap<String, TokenType>,
 }
 
 impl Default for Scanner {
@@ -19,6 +22,24 @@ impl Default for Scanner {
             start: 0,
             tokens: Vec::new(),
             exit_code: 0,
+            keywords: HashMap::from([
+                (String::from("and"), TokenType::AND),
+                (String::from("class"), TokenType::CLASS),
+                (String::from("else"), TokenType::ELSE),
+                (String::from("false"), TokenType::FALSE),
+                (String::from("for"), TokenType::FOR),
+                (String::from("fun"), TokenType::FUN),
+                (String::from("if"), TokenType::IF),
+                (String::from("nil"), TokenType::NIL),
+                (String::from("or"), TokenType::OR),
+                (String::from("print"), TokenType::PRINT),
+                (String::from("return"), TokenType::RETURN),
+                (String::from("super"), TokenType::SUPER),
+                (String::from("this"), TokenType::THIS),
+                (String::from("true"), TokenType::TRUE),
+                (String::from("var"), TokenType::VAR),
+                (String::from("while"), TokenType::WHILE),
+            ]),
         }
     }
 }
@@ -145,6 +166,29 @@ impl Scanner {
         );
     }
 
+    fn is_alpha(&self, c: Option<char>) -> bool {
+        return (c >= Some('a') && c <= Some('z'))
+            || (c >= Some('A') && c <= Some('Z'))
+            || c == Some('_');
+    }
+
+    fn is_alpha_numeric(&self, c: Option<char>) -> bool {
+        return self.is_alpha(c) || self.is_digit(c);
+    }
+
+    fn identifier(&mut self) {
+        while self.is_alpha_numeric(self.peek()) {
+            self.advance();
+        }
+
+        let text = self.source.get(self.start..self.current).unwrap();
+        let identifier = match self.keywords.get(text) {
+            Some(keyword) => keyword,
+            None => &TokenType::IDENTIFIER,
+        };
+        self.add_token(*identifier, None);
+    }
+
     fn scan_token(&mut self) {
         let token = self.advance();
         match token {
@@ -206,6 +250,8 @@ impl Scanner {
             Some(other) => {
                 if self.is_digit(Some(other)) {
                     self.number();
+                } else if self.is_alpha(Some(other)) {
+                    self.identifier();
                 } else {
                     self.error(format!("Unexpected character: {}", other));
                 }
