@@ -25,7 +25,7 @@ impl Default for Scanner {
 
 impl Scanner {
     fn is_at_end(&self) -> bool {
-        return self.current >= self.source.len();
+        return self.current >= self.source.chars().count();
     }
 
     pub fn scan_tokens(&mut self) -> u8 {
@@ -74,7 +74,7 @@ impl Scanner {
     }
 
     fn peek(&self) -> Option<char> {
-        if (self.is_at_end()) {
+        if self.is_at_end() {
             return None;
         };
         return self.source.chars().nth(self.current);
@@ -144,7 +144,7 @@ impl Scanner {
             Some('/') => {
                 if self.match_expected('/') {
                     // A comment goes until the end of the line.
-                    while (self.peek().is_some() && !self.is_at_end()) {
+                    while self.peek() != Some('\n') && !self.is_at_end() {
                         self.advance();
                     }
                 } else {
@@ -164,7 +164,11 @@ impl Scanner {
                 );
                 self.exit_code = 65;
             }
-            None => todo!(),
+            None => todo!(
+                "Unexpected token {:?} at position {:?}",
+                token,
+                self.current
+            ),
         }
     }
 }
