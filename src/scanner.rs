@@ -106,6 +106,40 @@ impl Scanner {
         self.add_token(TokenType::STRING, Some(String::from(value)));
     }
 
+    fn is_digit(&self, c: Option<char>) -> bool {
+        return c >= Some('0') && c <= Some('9');
+    }
+
+    fn peek_next(&self) -> Option<char> {
+        if (self.current + 1 >= self.source.chars().count()) {
+            return None;
+        };
+        return self.source.chars().nth(self.current + 1);
+    }
+
+    fn number(&mut self) {
+        while self.is_digit(self.peek()) {
+            self.advance();
+        }
+
+        // Look for a fractional part.
+        if self.peek() == Some('.') && self.is_digit(self.peek_next()) {
+            // Consume the "."
+            self.advance();
+
+            while (self.is_digit(self.peek())) {
+                self.advance();
+            }
+        }
+
+        self.add_token(
+            TokenType::NUMBER,
+            Some(String::from(
+                self.source.get(self.start..self.current).unwrap(),
+            )),
+        );
+    }
+
     fn scan_token(&mut self) {
         let token = self.advance();
         match token {
@@ -165,8 +199,11 @@ impl Scanner {
             }
             Some('"') => self.string(),
             Some(other) => {
-                self.error(format!("Unexpected character: {}", other));
-                self.exit_code = 65;
+                if self.is_digit(Some(other)) {
+                    self.number();
+                } else {
+                    self.error(format!("Unexpected character: {}", other));
+                }
             }
             None => todo!(
                 "Unexpected token {:?} at position {:?}",
