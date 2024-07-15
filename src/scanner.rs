@@ -80,39 +80,40 @@ impl Scanner {
         return self.source.chars().nth(self.current);
     }
 
+    fn string(&mut self) {
+        while self.peek() != Some('"') && !self.is_at_end() {
+            if self.peek() == Some('\n') {
+                self.line += 1;
+            }
+            self.advance();
+        }
+
+        if self.is_at_end() {
+            eprintln!("[line {}] Unterminated string.", self.line - 1);
+            return;
+        }
+
+        // The closing ".
+        self.advance();
+
+        // Trim the surrounding quotes.
+        let value = self.source.get(self.start + 1..self.current - 1).unwrap();
+        self.add_token(TokenType::STRING, Some(String::from(value)));
+    }
+
     fn scan_token(&mut self) {
         let token = self.advance();
         match token {
-            Some('(') => {
-                self.add_token(TokenType::LEFT_PAREN, None);
-            }
-            Some(')') => {
-                self.add_token(TokenType::RIGHT_PAREN, None);
-            }
-            Some('{') => {
-                self.add_token(TokenType::LEFT_BRACE, None);
-            }
-            Some('}') => {
-                self.add_token(TokenType::RIGHT_BRACE, None);
-            }
-            Some(',') => {
-                self.add_token(TokenType::COMMA, None);
-            }
-            Some('.') => {
-                self.add_token(TokenType::DOT, None);
-            }
-            Some('-') => {
-                self.add_token(TokenType::MINUS, None);
-            }
-            Some('+') => {
-                self.add_token(TokenType::PLUS, None);
-            }
-            Some(';') => {
-                self.add_token(TokenType::SEMICOLON, None);
-            }
-            Some('*') => {
-                self.add_token(TokenType::STAR, None);
-            }
+            Some('(') => self.add_token(TokenType::LEFT_PAREN, None),
+            Some(')') => self.add_token(TokenType::RIGHT_PAREN, None),
+            Some('{') => self.add_token(TokenType::LEFT_BRACE, None),
+            Some('}') => self.add_token(TokenType::RIGHT_BRACE, None),
+            Some(',') => self.add_token(TokenType::COMMA, None),
+            Some('.') => self.add_token(TokenType::DOT, None),
+            Some('-') => self.add_token(TokenType::MINUS, None),
+            Some('+') => self.add_token(TokenType::PLUS, None),
+            Some(';') => self.add_token(TokenType::SEMICOLON, None),
+            Some('*') => self.add_token(TokenType::STAR, None),
             Some('!') => {
                 if self.match_expected('=') {
                     self.add_token(TokenType::BANG_EQUAL, None);
@@ -157,6 +158,7 @@ impl Scanner {
             Some('\n') => {
                 self.line += 1;
             }
+            Some('"') => self.string(),
             Some(other) => {
                 eprintln!(
                     "[line {}] Error: Unexpected character: {}",

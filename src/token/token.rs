@@ -16,8 +16,10 @@ impl fmt::Display for Token {
         } else {
             write!(
                 f,
-                "{:?} {} {:?}",
-                self.token_type, self.lexeme, self.literal
+                "{:?} {} {}",
+                self.token_type,
+                self.lexeme,
+                self.literal.as_ref().unwrap()
             )
         }
     }
