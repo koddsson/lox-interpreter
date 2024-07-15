@@ -80,6 +80,11 @@ impl Scanner {
         return self.source.chars().nth(self.current);
     }
 
+    fn error(&mut self, message: String) {
+        eprintln!("[line {}] Error: {}", self.line, message);
+        self.exit_code = 65;
+    }
+
     fn string(&mut self) {
         while self.peek() != Some('"') && !self.is_at_end() {
             if self.peek() == Some('\n') {
@@ -89,8 +94,7 @@ impl Scanner {
         }
 
         if self.is_at_end() {
-            eprintln!("[line {}] Error: Unterminated string.", self.line);
-            self.exit_code = 65;
+            self.error(String::from("Unterminated string."));
             return;
         }
 
@@ -161,10 +165,7 @@ impl Scanner {
             }
             Some('"') => self.string(),
             Some(other) => {
-                eprintln!(
-                    "[line {}] Error: Unexpected character: {}",
-                    self.line, other
-                );
+                self.error(format!("Unexpected character: {}", other));
                 self.exit_code = 65;
             }
             None => todo!(
