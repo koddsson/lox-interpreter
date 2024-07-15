@@ -35,7 +35,7 @@ impl Scanner {
 
         self.tokens.push(Token {
             token_type: TokenType::EOF,
-            lexeme: String::from(" "),
+            lexeme: String::from(""),
             literal: None,
             line: self.line,
         });
