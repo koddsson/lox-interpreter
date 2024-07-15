@@ -39,12 +39,12 @@ fn main() -> ExitCode {
                 ..Default::default()
             };
 
-            scanner.scan_tokens();
+            let results = scanner.scan_tokens();
             for token in scanner.tokens {
                 println!("{}", token);
             }
 
-            return ExitCode::from(0);
+            return ExitCode::from(results);
         }
         _ => {
             writeln!(io::stderr(), "Unknown command: {}", command).unwrap();

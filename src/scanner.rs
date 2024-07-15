@@ -7,6 +7,7 @@ pub struct Scanner {
     pub current: usize,
     pub start: usize,
     pub tokens: Vec<Token>,
+    pub exit_code: u8,
 }
 
 impl Default for Scanner {
@@ -17,6 +18,7 @@ impl Default for Scanner {
             current: 0,
             start: 0,
             tokens: Vec::new(),
+            exit_code: 0,
         }
     }
 }
@@ -26,7 +28,7 @@ impl Scanner {
         return self.current >= self.source.len();
     }
 
-    pub fn scan_tokens(&mut self) {
+    pub fn scan_tokens(&mut self) -> u8 {
         while !self.is_at_end() {
             // We are at the beginning of the next lexeme.
             self.start = self.current;
@@ -39,6 +41,8 @@ impl Scanner {
             literal: None,
             line: self.line,
         });
+
+        return self.exit_code;
     }
 
     fn match_expected(&mut self, expected: char) -> bool {
@@ -136,7 +140,10 @@ impl Scanner {
             Some('\n') => {
                 self.line += 1;
             }
-            Some(other) => eprintln!("{} {}", self.line, other),
+            Some(other) => {
+                eprintln!("{} {}", self.line, other);
+                self.exit_code = 65;
+            }
             None => todo!(),
         }
     }
