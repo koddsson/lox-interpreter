@@ -90,6 +90,7 @@ impl Scanner {
 
         if self.is_at_end() {
             eprintln!("[line {}] Unterminated string.", self.line);
+            self.exit_code = 65;
             return;
         }
 
