@@ -138,7 +138,7 @@ impl Scanner {
                 self.source
                     .get(self.start..self.current)
                     .unwrap()
-                    .parse::<f32>()
+                    .parse::<f64>()
                     .unwrap()
                     .to_string(),
             )),
