@@ -141,7 +141,10 @@ impl Scanner {
                 self.line += 1;
             }
             Some(other) => {
-                eprintln!("{} {}", self.line, other);
+                eprintln!(
+                    "[line {}] Error: Unexpected character: {}",
+                    self.line, other
+                );
                 self.exit_code = 65;
             }
             None => todo!(),
