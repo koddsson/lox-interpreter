@@ -73,6 +73,13 @@ impl Scanner {
         });
     }
 
+    fn peek(&self) -> Option<char> {
+        if (self.is_at_end()) {
+            return None;
+        };
+        return self.source.chars().nth(self.current);
+    }
+
     fn scan_token(&mut self) {
         let token = self.advance();
         match token {
@@ -132,6 +139,16 @@ impl Scanner {
                     self.add_token(TokenType::GREATER_EQUAL, None);
                 } else {
                     self.add_token(TokenType::GREATER, None);
+                }
+            }
+            Some('/') => {
+                if self.match_expected('/') {
+                    // A comment goes until the end of the line.
+                    while (self.peek().is_some() && !self.is_at_end()) {
+                        self.advance();
+                    }
+                } else {
+                    self.add_token(TokenType::SLASH, None);
                 }
             }
             Some(' ') => {}
