@@ -134,14 +134,14 @@ impl Scanner {
 
         self.add_token(
             TokenType::NUMBER,
-            Some(String::from(
+            Some(String::from(format!(
+                "{:?}",
                 self.source
                     .get(self.start..self.current)
                     .unwrap()
                     .parse::<f64>()
                     .unwrap()
-                    .to_string(),
-            )),
+            ))),
         );
     }
 
