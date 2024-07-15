@@ -127,7 +127,7 @@ impl Scanner {
             // Consume the "."
             self.advance();
 
-            while (self.is_digit(self.peek())) {
+            while self.is_digit(self.peek()) {
                 self.advance();
             }
         }
@@ -135,7 +135,12 @@ impl Scanner {
         self.add_token(
             TokenType::NUMBER,
             Some(String::from(
-                self.source.get(self.start..self.current).unwrap(),
+                self.source
+                    .get(self.start..self.current)
+                    .unwrap()
+                    .parse::<f32>()
+                    .unwrap()
+                    .to_string(),
             )),
         );
     }
