@@ -3,8 +3,12 @@ use std::fs;
 use std::io::{self, Write};
 use std::process::ExitCode;
 
+use crate::parser::Parser;
 use crate::scanner::Scanner;
 
+mod expr;
+mod parse_error;
+mod parser;
 mod scanner;
 mod token;
 
@@ -27,13 +31,13 @@ fn main() -> ExitCode {
     let command = &args[1];
     let filename = &args[2];
 
+    let source = fs::read_to_string(filename).unwrap_or_else(|_| {
+        writeln!(io::stderr(), "Failed to read file {}", filename).unwrap();
+        String::new()
+    });
+
     match command.as_str() {
         "tokenize" => {
-            let source = fs::read_to_string(filename).unwrap_or_else(|_| {
-                writeln!(io::stderr(), "Failed to read file {}", filename).unwrap();
-                String::new()
-            });
-
             let mut scanner = Scanner {
                 source,
                 ..Default::default()
@@ -43,6 +47,26 @@ fn main() -> ExitCode {
             for token in scanner.tokens {
                 println!("{}", token);
             }
+
+            return ExitCode::from(results);
+        }
+        "parse" => {
+            let mut scanner = Scanner {
+                source,
+                ..Default::default()
+            };
+
+            let results = scanner.scan_tokens();
+
+            let mut parser = Parser {
+                tokens: scanner.tokens,
+                ..Default::default()
+            };
+
+            let results = parser.parse();
+            //for token in scanner.tokens {
+            //    println!("{}", token);
+            //}
 
             return ExitCode::from(results);
         }
