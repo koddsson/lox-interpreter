@@ -7,8 +7,3 @@ pub struct Expr<'a> {
     pub operator: Option<&'a Token>,
     pub right: Option<Box<Expr<'a>>>,
 }
-
-pub struct Unary {
-    pub operator: Option<&'static Token>,
-    pub right: Option<Box<Expr>>,
-}

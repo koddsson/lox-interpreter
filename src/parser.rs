@@ -1,4 +1,4 @@
-use crate::expr::{Expr, Unary};
+use crate::expr::Expr;
 use crate::parse_error::ParseError;
 use crate::token::token::Token;
 use crate::token::token_type::TokenType;
@@ -80,7 +80,7 @@ impl Parser {
         todo!();
     }
 
-    fn unary<'a>(self) -> Expr<'a> {
+    fn unary<'a>(mut self) -> Expr<'a> {
         if self.match_types(vec![TokenType::BANG, TokenType::MINUS]) {
             let operator = self.previous();
             let right = self.unary();
