@@ -9,8 +9,8 @@ pub struct Parser {
     pub current: usize,
 }
 
-impl Parser {
-    fn expression<'a>(self) -> Expr<'a> {
+impl<'a> Parser {
+    fn expression(self) -> Expr<'a> {
         return self.equality();
     }
 
@@ -80,7 +80,7 @@ impl Parser {
         todo!();
     }
 
-    fn unary<'a>(mut self) -> Expr<'a> {
+    fn unary(mut self) -> Expr<'a> {
         if self.match_types(vec![TokenType::BANG, TokenType::MINUS]) {
             let operator = self.previous();
             let right = self.unary();
@@ -94,7 +94,7 @@ impl Parser {
         return self.primary();
     }
 
-    fn factor<'a>(mut self) -> Expr<'a> {
+    fn factor(mut self) -> Expr<'a> {
         let mut expr = self.unary();
 
         while self.match_types(vec![TokenType::SLASH, TokenType::STAR]) {
@@ -110,7 +110,7 @@ impl Parser {
         return expr;
     }
 
-    fn term<'a>(mut self) -> Expr<'a> {
+    fn term(mut self) -> Expr<'a> {
         let mut expr = self.factor();
 
         while self.match_types(vec![TokenType::MINUS, TokenType::PLUS]) {
@@ -126,7 +126,7 @@ impl Parser {
         return expr;
     }
 
-    fn comparison<'a>(mut self) -> Expr<'a> {
+    fn comparison(mut self) -> Expr<'a> {
         let mut expr = self.term();
 
         while self.match_types(vec![
@@ -158,7 +158,7 @@ impl Parser {
         return false;
     }
 
-    fn equality<'a>(mut self) -> Expr<'a> {
+    fn equality(mut self) -> Expr<'a> {
         let mut expr = self.comparison();
 
         while self.match_types(vec![TokenType::BANG_EQUAL, TokenType::EQUAL_EQUAL]) {
