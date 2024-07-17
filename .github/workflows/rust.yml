@@ -12,6 +12,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions: write-all
     steps:
       - uses: actions/checkout@v4
       - uses: qRoC/cargo-actions@v1
@@ -23,6 +24,7 @@ jobs:
   code_style:
     continue-on-error: true
     runs-on: ubuntu-latest
+    permissions: write-all
     steps:
       - uses: actions/checkout@v4
       - uses: qRoC/cargo-actions@v1
@@ -35,6 +37,7 @@ jobs:
   lint:
     continue-on-error: true
     runs-on: ubuntu-latest
+    permissions: write-all
     steps:
       - uses: actions/checkout@v4
       - uses: qRoC/cargo-actions@v1
@@ -45,6 +48,7 @@ jobs:
 
   tests:
     runs-on: ubuntu-latest
+    permissions: write-all
     steps:
       - uses: actions/checkout@v4
       - uses: qRoC/cargo-actions@v1
@@ -55,6 +59,7 @@ jobs:
 
   audit:
     runs-on: ubuntu-latest
+    permissions: write-all
     steps:
       - uses: actions/checkout@v4
       - uses: qRoC/cargo-actions@v1
