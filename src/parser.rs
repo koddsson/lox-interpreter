@@ -10,7 +10,7 @@ pub struct Parser {
 }
 
 impl Parser {
-    fn expression(self) -> Expr {
+    fn expression<'a>(self) -> Expr<'a> {
         return self.equality();
     }
 
@@ -55,35 +55,37 @@ impl Parser {
     }
 
     fn primary(&self) -> Expr {
-        if (self.match_types(vec![TokenType::FALSE])) {
-            return Expr::Literal(Some(false));
-        }
-        if (self.match_types(vec![TokenType::TRUE])) {
-            return Expr::Literal(Some(true));
-        }
-        if (self.match_types(vec![TokenType::NIL])) {
-            return Expr::Literal(None);
-        }
+        //if (self.match_types(vec![TokenType::FALSE])) {
+        //    return Expr { Some(false)};
+        //}
+        //if (self.match_types(vec![TokenType::TRUE])) {
+        //    return Expr::Literal(Some(true));
+        //}
+        //if (self.match_types(vec![TokenType::NIL])) {
+        //    return Expr::Literal(None);
+        //}
 
-        if (self.match_types(vec![TokenType::NUMBER, TokenType::STRING])) {
-            return Expr::Literal(self.previous().unwrap().literal);
-        }
+        //if (self.match_types(vec![TokenType::NUMBER, TokenType::STRING])) {
+        //    return Expr::Literal(self.previous().unwrap().literal);
+        //}
 
-        if (self.match_types(vec![TokenType::LEFT_PAREN])) {
-            let expr = self.expression();
-            self.consume(
-                TokenType::RIGHT_PAREN,
-                String::from("Expect ')' after expression."),
-            );
-            return Expr::Grouping(expr);
-        }
+        //if (self.match_types(vec![TokenType::LEFT_PAREN])) {
+        //    let expr = self.expression();
+        //    self.consume(
+        //        TokenType::RIGHT_PAREN,
+        //        String::from("Expect ')' after expression."),
+        //    );
+        //    return Expr::Grouping(expr);
+        //}
+        todo!();
     }
 
-    fn unary(self) -> Unary {
+    fn unary<'a>(self) -> Expr<'a> {
         if self.match_types(vec![TokenType::BANG, TokenType::MINUS]) {
             let operator = self.previous();
             let right = self.unary();
-            return Unary {
+            return Expr {
+                left: None,
                 operator,
                 right: Some(Box::new(right)),
             };
@@ -92,7 +94,7 @@ impl Parser {
         return self.primary();
     }
 
-    fn factor(mut self) -> Expr {
+    fn factor<'a>(mut self) -> Expr<'a> {
         let mut expr = self.unary();
 
         while self.match_types(vec![TokenType::SLASH, TokenType::STAR]) {
@@ -108,7 +110,7 @@ impl Parser {
         return expr;
     }
 
-    fn term(self) -> Expr {
+    fn term<'a>(self) -> Expr<'a> {
         let mut expr = self.factor();
 
         while self.match_types(vec![TokenType::MINUS, TokenType::PLUS]) {
@@ -124,7 +126,7 @@ impl Parser {
         return expr;
     }
 
-    fn comparison(self) -> Expr {
+    fn comparison<'a>(self) -> Expr<'a> {
         let mut expr = self.term();
 
         while self.match_types(vec![
@@ -145,7 +147,7 @@ impl Parser {
         return expr;
     }
 
-    fn match_types(&'a mut self, types: Vec<TokenType>) -> bool {
+    fn match_types(&mut self, types: Vec<TokenType>) -> bool {
         for token_type in types {
             if self.check(token_type) {
                 self.advance();
@@ -156,7 +158,7 @@ impl Parser {
         return false;
     }
 
-    fn equality(self) -> Expr {
+    fn equality<'a>(mut self) -> Expr<'a> {
         let mut expr = self.comparison();
 
         while self.match_types(vec![TokenType::BANG_EQUAL, TokenType::EQUAL_EQUAL]) {

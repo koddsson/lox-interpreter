@@ -2,10 +2,10 @@ use crate::token::token::Token;
 
 pub trait Expression {}
 
-pub struct Expr {
-    pub left: Option<Box<Expr>>,
-    pub operator: Option<Token>,
-    pub right: Option<Box<Expr>>,
+pub struct Expr<'a> {
+    pub left: Option<Box<Expr<'a>>>,
+    pub operator: Option<&'a Token>,
+    pub right: Option<Box<Expr<'a>>>,
 }
 
 pub struct Unary {

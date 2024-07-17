@@ -1,12 +1,12 @@
 use crate::token::token::Token;
 use std::fmt;
 
-pub struct ParseError {
-    pub peek: &Token,
+pub struct ParseError<'a> {
+    pub peek: &'a Token,
     pub message: String,
 }
 
-impl fmt::Display for ParseError {
+impl<'a> fmt::Display for ParseError<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{} {}", self.peek, self.message)
     }
