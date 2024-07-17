@@ -22,17 +22,17 @@ impl Parser {
                 return;
             }
 
-            let ignored_tokens = vec![
-                TokenType::CLASS,
-                TokenType::FUN,
-                TokenType::VAR,
-                TokenType::FOR,
-                TokenType::IF,
-                TokenType::WHILE,
-                TokenType::PRINT,
-                TokenType::RETURN,
-            ];
-            if ignored_tokens.contains(&self.peek().unwrap().token_type) {
+            if matches!(
+                &self.peek().unwrap().token_type,
+                TokenType::CLASS
+                    | TokenType::FUN
+                    | TokenType::VAR
+                    | TokenType::FOR
+                    | TokenType::IF
+                    | TokenType::WHILE
+                    | TokenType::PRINT
+                    | TokenType::RETURN
+            ) {
                 return;
             }
 
