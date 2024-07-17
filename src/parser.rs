@@ -110,7 +110,7 @@ impl Parser {
         return expr;
     }
 
-    fn term<'a>(self) -> Expr<'a> {
+    fn term<'a>(mut self) -> Expr<'a> {
         let mut expr = self.factor();
 
         while self.match_types(vec![TokenType::MINUS, TokenType::PLUS]) {
@@ -126,7 +126,7 @@ impl Parser {
         return expr;
     }
 
-    fn comparison<'a>(self) -> Expr<'a> {
+    fn comparison<'a>(mut self) -> Expr<'a> {
         let mut expr = self.term();
 
         while self.match_types(vec![
