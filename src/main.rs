@@ -30,7 +30,7 @@ fn main() -> ExitCode {
     match command.as_str() {
         "tokenize" => {
             let mut scanner = Scanner {
-                source,
+                source: source.as_str(),
                 ..Default::default()
             };
 
@@ -43,7 +43,7 @@ fn main() -> ExitCode {
         }
         "parse" => {
             let mut scanner = Scanner {
-                source,
+                source: source.as_str(),
                 ..Default::default()
             };
 

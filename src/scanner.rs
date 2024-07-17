@@ -3,8 +3,8 @@ use std::collections::HashMap;
 use crate::token::token::Token;
 use crate::token::token_type::TokenType;
 
-pub struct Scanner {
-    pub source: String,
+pub struct Scanner<'a> {
+    pub source: &'a str,
     pub line: usize,
     pub current: usize,
     pub start: usize,
@@ -13,10 +13,10 @@ pub struct Scanner {
     pub keywords: HashMap<String, TokenType>,
 }
 
-impl Default for Scanner {
-    fn default() -> Scanner {
+impl<'a> Default for Scanner<'a> {
+    fn default() -> Scanner<'a> {
         Scanner {
-            source: String::from(""),
+            source: "",
             line: 1,
             current: 0,
             start: 0,
@@ -44,7 +44,7 @@ impl Default for Scanner {
     }
 }
 
-impl Scanner {
+impl<'a> Scanner<'a> {
     fn is_at_end(&self) -> bool {
         return self.current >= self.source.chars().count();
     }
