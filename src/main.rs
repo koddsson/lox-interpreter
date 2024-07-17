@@ -12,15 +12,6 @@ mod parser;
 mod scanner;
 mod token;
 
-/*
-[line 1] Error: Unexpected character: $
-[line 1] Error: Unexpected character: #
-COMMA , null
-DOT . null
-LEFT_PAREN ( null
-EOF  null
-*/
-
 fn main() -> ExitCode {
     let args: Vec<String> = env::args().collect();
     if args.len() < 3 {
@@ -58,10 +49,14 @@ fn main() -> ExitCode {
 
             let results = scanner.scan_tokens();
 
-            let mut parser = Parser {
+            let parser = Parser {
                 tokens: scanner.tokens,
                 ..Default::default()
             };
+
+            if results != 0 {
+                return ExitCode::from(results);
+            }
 
             let results = parser.parse();
             //for token in scanner.tokens {

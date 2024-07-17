@@ -14,6 +14,10 @@ impl Parser {
         return self.equality();
     }
 
+    pub fn parse(self) -> u8 {
+        todo!();
+    }
+
     fn synchronize(mut self) {
         self.advance();
 
