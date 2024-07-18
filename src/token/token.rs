@@ -8,6 +8,17 @@ pub enum Literal {
     Number(f64),
 }
 
+impl<'a> fmt::Display for Literal {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let message = match self {
+            Literal::Identifier(id) => format!("{}", id),
+            Literal::Str(str) => format!("{}", str),
+            Literal::Number(n) => format!("{}", n),
+        };
+        write!(f, "{}", message)
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct Token<'a> {
     pub token_type: token_type::TokenType,

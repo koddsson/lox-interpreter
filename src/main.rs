@@ -66,7 +66,7 @@ fn main() -> ExitCode {
                 }
             };
 
-            println!("{:?}", expression);
+            println!("{}", expression);
 
             return ExitCode::from(results);
         }
