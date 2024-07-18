@@ -1,1 +1,6 @@
-true
+var greeting = "Hello"
+if (greeting == "Hello") {
+    return true
+} else {
+    return false
+}
