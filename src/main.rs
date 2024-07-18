@@ -1,7 +1,6 @@
 #[allow(clippy::needless_return)]
 use std::env;
 use std::fs;
-use std::io::{self, Write};
 use std::process::ExitCode;
 
 use crate::parser::Parser;
@@ -16,7 +15,7 @@ mod token;
 fn main() -> ExitCode {
     let args: Vec<String> = env::args().collect();
     if args.len() < 3 {
-        writeln!(io::stderr(), "Usage: {} tokenize <filename>", args[0]).unwrap();
+        eprintln!("Usage: {} tokenize <filename>", args[0]);
         return ExitCode::FAILURE;
     }
 
@@ -24,7 +23,7 @@ fn main() -> ExitCode {
     let filename = &args[2];
 
     let source = fs::read_to_string(filename).unwrap_or_else(|_| {
-        writeln!(io::stderr(), "Failed to read file {}", filename).unwrap();
+        eprintln!("Failed to read file {}", filename);
         String::new()
     });
 
@@ -67,7 +66,7 @@ fn main() -> ExitCode {
             return ExitCode::from(results);
         }
         _ => {
-            writeln!(io::stderr(), "Unknown command: {}", command).unwrap();
+            eprintln!("Unknown command: {}", command);
             return ExitCode::FAILURE;
         }
     }
