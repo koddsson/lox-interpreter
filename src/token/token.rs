@@ -11,9 +11,9 @@ pub enum Literal {
 impl<'a> fmt::Display for Literal {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let message = match self {
-            Literal::Identifier(id) => id,
-            Literal::Str(literal_string) => literal_string,
-            Literal::Number(n) => &n.to_string(),
+            Literal::Identifier(id) => format!("{}", id),
+            Literal::Str(str) => format!("{}", str),
+            Literal::Number(n) => format!("{}", n),
         };
         write!(f, "{}", message)
     }
@@ -29,9 +29,10 @@ pub struct Token<'a> {
 
 impl<'a> fmt::Display for Token<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        return match &self.literal {
-            Some(literal) => write!(f, "{}", literal),
-            None => write!(f, "{}", self.token_type),
-        };
+        if self.literal.is_none() {
+            write!(f, "{} {} null", self.token_type, self.lexeme)
+        } else {
+            write!(f, "{} {} {:?}", self.token_type, self.lexeme, self.literal)
+        }
     }
 }

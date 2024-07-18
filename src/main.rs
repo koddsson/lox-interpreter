@@ -36,7 +36,7 @@ fn main() -> ExitCode {
 
             let results = scanner.scan_tokens();
             for token in scanner.tokens {
-                println!("{:?}", token);
+                println!("{}", token);
             }
 
             return ExitCode::from(results);
