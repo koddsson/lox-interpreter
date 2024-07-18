@@ -1,9 +1,23 @@
-use crate::token::token::Token;
+#[derive(Debug, Clone)]
+pub enum Expr {
+    Unary(UnaryOp, Box<Expr>),
+    Literal(Literal),
+}
 
-pub trait Expression {}
+#[derive(Debug, Copy, Clone)]
+pub enum UnaryOp {
+    Minus,
+    Bang,
+}
 
-pub struct Expr<'a> {
-    pub left: Option<Box<Expr<'a>>>,
-    pub operator: Option<&'a Token>,
-    pub right: Option<Box<Expr<'a>>>,
+pub struct UnaryOperator {
+    pub token: UnaryOp,
+}
+
+#[derive(Debug, Clone)]
+pub enum Literal {
+    Number(f64),
+    Nil,
+    False,
+    True,
 }

@@ -1,25 +1,30 @@
 use crate::token::token_type;
 use std::fmt;
 
-pub struct Token {
+#[derive(Debug, Clone)]
+pub enum Literal {
+    Identifier(String),
+    Str(String),
+    Number(f64),
+}
+
+#[derive(Debug, Clone)]
+pub struct Token<'a> {
     pub token_type: token_type::TokenType,
-    // TODO: Make lexeme a string? Just easier to work with?
-    pub lexeme: String,
-    pub literal: Option<String>,
+    pub lexeme: &'a str,
+    pub literal: Option<Literal>,
     pub line: usize,
 }
 
-impl fmt::Display for Token {
+impl<'a> fmt::Display for Token<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         if self.literal.is_none() {
             write!(f, "{:?} {} null", self.token_type, self.lexeme)
         } else {
             write!(
                 f,
-                "{:?} {} {}",
-                self.token_type,
-                self.lexeme,
-                self.literal.as_ref().unwrap()
+                "{:?} {} {:?}",
+                self.token_type, self.lexeme, self.literal
             )
         }
     }

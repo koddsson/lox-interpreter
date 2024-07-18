@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use crate::token::token::Literal;
 use crate::token::token::Token;
 use crate::token::token_type::TokenType;
 
@@ -8,7 +9,7 @@ pub struct Scanner<'a> {
     pub line: usize,
     pub current: usize,
     pub start: usize,
-    pub tokens: Vec<Token>,
+    pub tokens: Vec<Token<'a>>,
     pub exit_code: u8,
     pub keywords: HashMap<String, TokenType>,
 }
@@ -58,7 +59,7 @@ impl<'a> Scanner<'a> {
 
         self.tokens.push(Token {
             token_type: TokenType::EOF,
-            lexeme: String::from(""),
+            lexeme: "",
             literal: None,
             line: self.line,
         });
@@ -84,11 +85,11 @@ impl<'a> Scanner<'a> {
         return char;
     }
 
-    fn add_token(&mut self, token_type: TokenType, literal: Option<String>) {
+    fn add_token(&mut self, token_type: TokenType, literal: Option<Literal>) {
         let lexeme = self.source.get(self.start..self.current).unwrap();
         self.tokens.push(Token {
             token_type,
-            lexeme: lexeme.to_string(),
+            lexeme,
             literal,
             line: self.line,
         });
@@ -124,7 +125,7 @@ impl<'a> Scanner<'a> {
 
         // Trim the surrounding quotes.
         let value = self.source.get(self.start + 1..self.current - 1).unwrap();
-        self.add_token(TokenType::STRING, Some(String::from(value)));
+        self.add_token(TokenType::STRING, Some(Literal::Str(String::from(value))));
     }
 
     fn is_digit(&self, c: Option<char>) -> bool {
@@ -155,14 +156,13 @@ impl<'a> Scanner<'a> {
 
         self.add_token(
             TokenType::NUMBER,
-            Some(String::from(format!(
-                "{:?}",
+            Some(Literal::Number(
                 self.source
                     .get(self.start..self.current)
                     .unwrap()
                     .parse::<f64>()
-                    .unwrap()
-            ))),
+                    .unwrap(),
+            )),
         );
     }
 
