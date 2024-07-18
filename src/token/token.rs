@@ -30,13 +30,9 @@ pub struct Token<'a> {
 impl<'a> fmt::Display for Token<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         if self.literal.is_none() {
-            write!(f, "{:?} {} null", self.token_type, self.lexeme)
+            write!(f, "{} {} null", self.token_type, self.lexeme)
         } else {
-            write!(
-                f,
-                "{:?} {} {:?}",
-                self.token_type, self.lexeme, self.literal
-            )
+            write!(f, "{} {} {:?}", self.token_type, self.lexeme, self.literal)
         }
     }
 }

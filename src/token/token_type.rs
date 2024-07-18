@@ -1,3 +1,5 @@
+use std::fmt;
+
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum TokenType {
     // Single-character tokens.
@@ -47,4 +49,10 @@ pub enum TokenType {
     While,
 
     EOF,
+}
+
+impl<'a> fmt::Display for TokenType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.to_string().to_ascii_uppercase())
+    }
 }
