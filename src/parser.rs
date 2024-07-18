@@ -12,8 +12,8 @@ pub struct Parser<'a> {
 }
 
 impl<'a> Parser<'a> {
-    pub fn parse(self) -> u8 {
-        todo!();
+    pub fn parse(&mut self) -> Result<Expr, ParseError> {
+        return self.expression();
     }
 
     fn expression(&mut self) -> Result<Expr, ParseError> {

@@ -49,7 +49,7 @@ fn main() -> ExitCode {
 
             let results = scanner.scan_tokens();
 
-            let parser = Parser {
+            let mut parser = Parser {
                 tokens: scanner.tokens,
                 ..Default::default()
             };
@@ -58,10 +58,15 @@ fn main() -> ExitCode {
                 return ExitCode::from(results);
             }
 
-            let results = parser.parse();
-            //for token in scanner.tokens {
-            //    println!("{}", token);
-            //}
+            let expression = match parser.parse() {
+                Ok(expression) => expression,
+                Err(err) => {
+                    eprintln!("{}", err);
+                    return ExitCode::FAILURE;
+                }
+            };
+
+            println!("{:?}", expression);
 
             return ExitCode::from(results);
         }
