@@ -104,7 +104,7 @@ impl<'a> Parser<'a> {
     }
 
     fn unary(&mut self) -> Result<Expr, ParseError> {
-        while self.match_types(vec![TokenType::SLASH, TokenType::STAR]) {
+        if self.match_types(vec![TokenType::SLASH, TokenType::STAR]) {
             let operator = self.previous();
             let maybe_binary_operator = Parser::token_to_unary_operator(operator);
 
