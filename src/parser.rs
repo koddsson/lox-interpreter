@@ -22,7 +22,7 @@ impl<'a> Parser<'a> {
 
     fn equality(&mut self) -> Result<Expr, ParseError> {
         let mut expr = self.comparison()?;
-        while self.match_types(vec![TokenType::BANG_EQUAL, TokenType::EQUAL_EQUAL]) {
+        while self.match_types(vec![TokenType::BangEqual, TokenType::EqualEqual]) {
             let operator = self.previous();
             let maybe_binary_operator = Parser::token_to_binary_operator(operator);
 
@@ -43,10 +43,10 @@ impl<'a> Parser<'a> {
         let mut expr = self.term()?;
 
         while self.match_types(vec![
-            TokenType::GREATER,
-            TokenType::GREATER_EQUAL,
-            TokenType::LESS,
-            TokenType::LESS_EQUAL,
+            TokenType::Greater,
+            TokenType::GreaterEqual,
+            TokenType::Less,
+            TokenType::LessEqual,
         ]) {
             let operator = self.previous();
             let maybe_binary_operator = Parser::token_to_binary_operator(operator);
@@ -67,7 +67,7 @@ impl<'a> Parser<'a> {
     fn term(&mut self) -> Result<Expr, ParseError> {
         let mut expr = self.factor()?;
 
-        while self.match_types(vec![TokenType::MINUS, TokenType::PLUS]) {
+        while self.match_types(vec![TokenType::Minus, TokenType::Plus]) {
             let operator = self.previous();
             let maybe_binary_operator = Parser::token_to_binary_operator(operator);
 
@@ -87,7 +87,7 @@ impl<'a> Parser<'a> {
     fn factor(&mut self) -> Result<Expr, ParseError> {
         let mut expr = self.unary()?;
 
-        while self.match_types(vec![TokenType::SLASH, TokenType::STAR]) {
+        while self.match_types(vec![TokenType::Slash, TokenType::Star]) {
             let operator = self.previous();
             let maybe_binary_operator = Parser::token_to_binary_operator(operator);
             let right = self.unary()?;
@@ -104,7 +104,7 @@ impl<'a> Parser<'a> {
     }
 
     fn unary(&mut self) -> Result<Expr, ParseError> {
-        if self.match_types(vec![TokenType::SLASH, TokenType::STAR]) {
+        if self.match_types(vec![TokenType::Slash, TokenType::Star]) {
             let operator = self.previous();
             let maybe_binary_operator = Parser::token_to_unary_operator(operator);
 
@@ -120,26 +120,26 @@ impl<'a> Parser<'a> {
     }
 
     fn primary(&mut self) -> Result<Expr, ParseError> {
-        if self.match_types(vec![TokenType::FALSE]) {
+        if self.match_types(vec![TokenType::False]) {
             return Ok(Expr::Literal(Literal::False));
         }
-        if self.match_types(vec![TokenType::TRUE]) {
+        if self.match_types(vec![TokenType::True]) {
             return Ok(Expr::Literal(Literal::True));
         }
-        if self.match_types(vec![TokenType::NIL]) {
+        if self.match_types(vec![TokenType::Nil]) {
             return Ok(Expr::Literal(Literal::Nil));
         }
 
-        if self.match_types(vec![TokenType::NUMBER]) {
+        if self.match_types(vec![TokenType::Number]) {
             match &self.previous().literal {
                 Some(token::Literal::Number(n)) => return Ok(Expr::Literal(Literal::Number(*n))),
                 Some(other) => panic!("Failed to parse number"),
                 None => panic!("Failed to parse number"),
             }
         }
-        if self.match_types(vec![TokenType::LEFT_PAREN]) {
+        if self.match_types(vec![TokenType::LeftParen]) {
             let expr = Box::new(self.expression()?);
-            self.consume(TokenType::RIGHT_PAREN, "Expect ')' after expression.");
+            self.consume(TokenType::RightParen, "Expect ')' after expression.");
             return Ok(Expr::Grouping(expr));
         }
 
@@ -150,20 +150,20 @@ impl<'a> Parser<'a> {
         self.advance();
 
         while !self.is_at_end() {
-            if self.previous().token_type == TokenType::SEMICOLON {
+            if self.previous().token_type == TokenType::Semicolon {
                 return;
             }
 
             if matches!(
                 &self.peek().token_type,
-                TokenType::CLASS
-                    | TokenType::FUN
-                    | TokenType::VAR
-                    | TokenType::FOR
-                    | TokenType::IF
-                    | TokenType::WHILE
-                    | TokenType::PRINT
-                    | TokenType::RETURN
+                TokenType::Class
+                    | TokenType::Fun
+                    | TokenType::Var
+                    | TokenType::For
+                    | TokenType::If
+                    | TokenType::While
+                    | TokenType::Print
+                    | TokenType::Return
             ) {
                 return;
             }
@@ -174,24 +174,24 @@ impl<'a> Parser<'a> {
 
     pub fn token_to_binary_operator(token: &'a Token) -> Result<BinaryOp, ParseError> {
         match token.token_type {
-            TokenType::PLUS => Ok(BinaryOp::Plus),
-            TokenType::MINUS => Ok(BinaryOp::Minus),
-            TokenType::STAR => Ok(BinaryOp::Star),
-            TokenType::SLASH => Ok(BinaryOp::Slash),
-            TokenType::EQUAL_EQUAL => Ok(BinaryOp::EqualEqual),
-            TokenType::BANG_EQUAL => Ok(BinaryOp::BangEqual),
-            TokenType::LESS => Ok(BinaryOp::Less),
-            TokenType::LESS_EQUAL => Ok(BinaryOp::LessEqual),
-            TokenType::GREATER => Ok(BinaryOp::Greater),
-            TokenType::GREATER_EQUAL => Ok(BinaryOp::GreaterEqual),
+            TokenType::Plus => Ok(BinaryOp::Plus),
+            TokenType::Minus => Ok(BinaryOp::Minus),
+            TokenType::Star => Ok(BinaryOp::Star),
+            TokenType::Slash => Ok(BinaryOp::Slash),
+            TokenType::EqualEqual => Ok(BinaryOp::EqualEqual),
+            TokenType::BangEqual => Ok(BinaryOp::BangEqual),
+            TokenType::Less => Ok(BinaryOp::Less),
+            TokenType::LessEqual => Ok(BinaryOp::LessEqual),
+            TokenType::Greater => Ok(BinaryOp::Greater),
+            TokenType::GreaterEqual => Ok(BinaryOp::GreaterEqual),
             _ => Err(ParseError {}),
         }
     }
 
     pub fn token_to_unary_operator(token: &'a Token) -> Result<UnaryOp, ParseError> {
         match token.token_type {
-            TokenType::MINUS => Ok(UnaryOp::Minus),
-            TokenType::BANG => Ok(UnaryOp::Bang),
+            TokenType::Minus => Ok(UnaryOp::Minus),
+            TokenType::Bang => Ok(UnaryOp::Bang),
             _ => Err(ParseError {}),
         }
     }

@@ -24,22 +24,22 @@ impl<'a> Default for Scanner<'a> {
             tokens: Vec::new(),
             exit_code: 0,
             keywords: HashMap::from([
-                (String::from("and"), TokenType::AND),
-                (String::from("class"), TokenType::CLASS),
-                (String::from("else"), TokenType::ELSE),
-                (String::from("false"), TokenType::FALSE),
-                (String::from("for"), TokenType::FOR),
-                (String::from("fun"), TokenType::FUN),
-                (String::from("if"), TokenType::IF),
-                (String::from("nil"), TokenType::NIL),
-                (String::from("or"), TokenType::OR),
-                (String::from("print"), TokenType::PRINT),
-                (String::from("return"), TokenType::RETURN),
-                (String::from("super"), TokenType::SUPER),
-                (String::from("this"), TokenType::THIS),
-                (String::from("true"), TokenType::TRUE),
-                (String::from("var"), TokenType::VAR),
-                (String::from("while"), TokenType::WHILE),
+                (String::from("and"), TokenType::And),
+                (String::from("class"), TokenType::Class),
+                (String::from("else"), TokenType::Else),
+                (String::from("false"), TokenType::False),
+                (String::from("for"), TokenType::For),
+                (String::from("fun"), TokenType::Fun),
+                (String::from("if"), TokenType::If),
+                (String::from("nil"), TokenType::Nil),
+                (String::from("or"), TokenType::Or),
+                (String::from("print"), TokenType::Print),
+                (String::from("return"), TokenType::Return),
+                (String::from("super"), TokenType::Super),
+                (String::from("this"), TokenType::This),
+                (String::from("true"), TokenType::True),
+                (String::from("var"), TokenType::Var),
+                (String::from("while"), TokenType::While),
             ]),
         }
     }
@@ -125,7 +125,7 @@ impl<'a> Scanner<'a> {
 
         // Trim the surrounding quotes.
         let value = self.source.get(self.start + 1..self.current - 1).unwrap();
-        self.add_token(TokenType::STRING, Some(Literal::Str(String::from(value))));
+        self.add_token(TokenType::String, Some(Literal::Str(String::from(value))));
     }
 
     fn is_digit(&self, c: Option<char>) -> bool {
@@ -133,7 +133,7 @@ impl<'a> Scanner<'a> {
     }
 
     fn peek_next(&self) -> Option<char> {
-        if (self.current + 1 >= self.source.chars().count()) {
+        if self.current + 1 >= self.source.chars().count() {
             return None;
         };
         return self.source.chars().nth(self.current + 1);
@@ -155,7 +155,7 @@ impl<'a> Scanner<'a> {
         }
 
         self.add_token(
-            TokenType::NUMBER,
+            TokenType::Number,
             Some(Literal::Number(
                 self.source
                     .get(self.start..self.current)
@@ -184,7 +184,7 @@ impl<'a> Scanner<'a> {
         let text = self.source.get(self.start..self.current).unwrap();
         let identifier = match self.keywords.get(text) {
             Some(keyword) => keyword,
-            None => &TokenType::IDENTIFIER,
+            None => &TokenType::Identifier,
         };
         self.add_token(*identifier, None);
     }
@@ -192,42 +192,42 @@ impl<'a> Scanner<'a> {
     fn scan_token(&mut self) {
         let token = self.advance();
         match token {
-            Some('(') => self.add_token(TokenType::LEFT_PAREN, None),
-            Some(')') => self.add_token(TokenType::RIGHT_PAREN, None),
-            Some('{') => self.add_token(TokenType::LEFT_BRACE, None),
-            Some('}') => self.add_token(TokenType::RIGHT_BRACE, None),
-            Some(',') => self.add_token(TokenType::COMMA, None),
-            Some('.') => self.add_token(TokenType::DOT, None),
-            Some('-') => self.add_token(TokenType::MINUS, None),
-            Some('+') => self.add_token(TokenType::PLUS, None),
-            Some(';') => self.add_token(TokenType::SEMICOLON, None),
-            Some('*') => self.add_token(TokenType::STAR, None),
+            Some('(') => self.add_token(TokenType::LeftParen, None),
+            Some(')') => self.add_token(TokenType::RightParen, None),
+            Some('{') => self.add_token(TokenType::LeftBrace, None),
+            Some('}') => self.add_token(TokenType::RightBrace, None),
+            Some(',') => self.add_token(TokenType::Comma, None),
+            Some('.') => self.add_token(TokenType::Dot, None),
+            Some('-') => self.add_token(TokenType::Minus, None),
+            Some('+') => self.add_token(TokenType::Plus, None),
+            Some(';') => self.add_token(TokenType::Semicolon, None),
+            Some('*') => self.add_token(TokenType::Star, None),
             Some('!') => {
                 if self.match_expected('=') {
-                    self.add_token(TokenType::BANG_EQUAL, None);
+                    self.add_token(TokenType::BangEqual, None);
                 } else {
-                    self.add_token(TokenType::BANG, None);
+                    self.add_token(TokenType::Bang, None);
                 }
             }
             Some('=') => {
                 if self.match_expected('=') {
-                    self.add_token(TokenType::EQUAL_EQUAL, None);
+                    self.add_token(TokenType::EqualEqual, None);
                 } else {
-                    self.add_token(TokenType::EQUAL, None);
+                    self.add_token(TokenType::Equal, None);
                 }
             }
             Some('<') => {
                 if self.match_expected('=') {
-                    self.add_token(TokenType::LESS_EQUAL, None);
+                    self.add_token(TokenType::LessEqual, None);
                 } else {
-                    self.add_token(TokenType::LESS, None);
+                    self.add_token(TokenType::Less, None);
                 }
             }
             Some('>') => {
                 if self.match_expected('=') {
-                    self.add_token(TokenType::GREATER_EQUAL, None);
+                    self.add_token(TokenType::GreaterEqual, None);
                 } else {
-                    self.add_token(TokenType::GREATER, None);
+                    self.add_token(TokenType::Greater, None);
                 }
             }
             Some('/') => {
@@ -237,7 +237,7 @@ impl<'a> Scanner<'a> {
                         self.advance();
                     }
                 } else {
-                    self.add_token(TokenType::SLASH, None);
+                    self.add_token(TokenType::Slash, None);
                 }
             }
             Some(' ') => {}
