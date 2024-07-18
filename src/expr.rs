@@ -2,16 +2,27 @@
 pub enum Expr {
     Unary(UnaryOp, Box<Expr>),
     Literal(Literal),
+    Binary(Box<Expr>, BinaryOp, Box<Expr>),
+}
+
+#[derive(Debug, Copy, Clone)]
+pub enum BinaryOp {
+    Plus,
+    Minus,
+    Star,
+    Slash,
+    EqualEqual,
+    BangEqual,
+    Less,
+    LessEqual,
+    Greater,
+    GreaterEqual,
 }
 
 #[derive(Debug, Copy, Clone)]
 pub enum UnaryOp {
     Minus,
     Bang,
-}
-
-pub struct UnaryOperator {
-    pub token: UnaryOp,
 }
 
 #[derive(Debug, Clone)]

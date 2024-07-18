@@ -1,16 +1,16 @@
-use crate::expr::{Expr, UnaryOp, Literal};
+use crate::expr::{BinaryOp, Expr, Literal, UnaryOp};
 use crate::parse_error::ParseError;
 use crate::token::token::Token;
 use crate::token::token_type::TokenType;
 
-#[derive(Default, Copy)]
-pub struct Parser {
-    pub tokens: Vec<Token>,
+#[derive(Default)]
+pub struct Parser<'a> {
+    pub tokens: Vec<Token<'a>>,
     pub current: usize,
 }
 
-impl<'a> Parser {
-    fn expression(mut self) -> Expr<'a> {
+impl<'a> Parser<'a> {
+    fn expression(mut self) -> Expr {
         return self.equality();
     }
 
@@ -103,6 +103,24 @@ impl<'a> Parser {
         return expr;
     }
 
+        fn equality(&mut self) -> Result<Expr, ParseError> {
+            let expr = self.comparison();
+
+            while self.match_types(vec![TokenType::BANG_EQUAL, TokenType::EQUAL_EQUAL]) {
+                        let operator = self.previous();
+                        let right = self.comparison();
+
+                        let binary_operator_maybe = Parser::token_to_binary_operator(operator);
+
+                        return match binary_operator_maybe {
+                            Ok(binary_operator) =>  Ok(Expr::Binary(Box::new(expr), binary_operator, Box::new(right))),
+                            Err(err) => Err(err)
+                        }
+            }
+
+            return Ok(expr);
+        }
+
     fn unary(&mut self) -> Result<Expr, ParseError> {
         if self.match_types(vec![TokenType::BANG, TokenType::MINUS]) {
             let operator = self.previous();
@@ -120,6 +138,23 @@ impl<'a> Parser {
 
         return self.primary();
     }
+
+    pub fn token_to_binary_operator(token: &'a Token) -> Result<BinaryOp, ParseError<'a>> {
+        match token.token_type {
+            TokenType::PLUS => Ok(BinaryOp::Plus),
+            TokenType::MINUS => Ok(BinaryOp::Minus),
+            TokenType::STAR => Ok(BinaryOp::Star),
+            TokenType::SLASH => Ok(BinaryOp::Slash),
+            TokenType::EQUAL_EQUAL => Ok(BinaryOp::EqualEqual),
+            TokenType::BANG_EQUAL => Ok(BinaryOp::BangEqual),
+            TokenType::LESS => Ok(BinaryOp::Less),
+            TokenType::LESS_EQUAL => Ok(BinaryOp::LessEqual),
+            TokenType::GREATER => Ok(BinaryOp::Greater),
+            TokenType::GREATER_EQUAL => Ok(BinaryOp::GreaterEqual),
+            _ => Err(ParseError { peek: token, message: "Error converting a token to binary operator" })
+        }
+    }
+
 
 
     pub fn token_to_unary_operator(token: &'a Token) -> Result<UnaryOp, ParseError<'a>> {
@@ -146,8 +181,8 @@ impl<'a> Parser {
         return expr;
     }
 
-    fn comparison(mut self) -> Expr {
-        let mut expr = self.term();
+    fn comparison(&mut self) -> Result<Expr, ParseError> {
+        let mut expr = self.term()?;
 
         while self.match_types(vec![
             TokenType::GREATER,
@@ -157,14 +192,23 @@ impl<'a> Parser {
         ]) {
             let operator = self.previous();
             let right = self.term();
-            expr = Expr {
-                left: Some(Box::new(expr)),
-                operator,
-                right: Some(Box::new(right)),
+
+            let maybe_binary_operator = Parser::token_to_binary_operator(operator);
+
+            match maybe_binary_operator {
+                Ok(binary_operator) =>  {
+                    expr = Expr::Binary(
+                    Box::new(expr),
+                    binary_operator,
+                    Box::new(right),
+                    )
+                },
+                Err(err) => return Err(err)
             }
+
         }
 
-        return expr;
+        return Ok(expr);
     }
 
     fn match_types(&mut self, types: Vec<TokenType>) -> bool {
@@ -176,23 +220,6 @@ impl<'a> Parser {
         }
 
         return false;
-    }
-
-    fn equality(&mut self) -> Result<Expr, ParseError> {
-        let expr = self.comparison();
-
-        while self.match_types(vec![TokenType::BANG_EQUAL, TokenType::EQUAL_EQUAL]) {
-                    let operator = self.previous();
-                    let right = Box::new(self.comparison());
-
-                    expr = Expr {
-                        left: Some(Box::new(expr)),
-                        operator,
-                        right: Some(right),
-                    };
-        }
-
-        return Ok(expr);
     }
 
     fn check(&self, token_type: TokenType) -> bool {
@@ -217,7 +244,7 @@ impl<'a> Parser {
         return &self.tokens[self.current];
     }
 
-    fn previous(&self) -> &Token {
+    fn previous(&mut self) -> &Token {
         return &self.tokens[self.current - 1];
     }
 }
