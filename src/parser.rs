@@ -1,4 +1,4 @@
-#[allow(clippy::needless_return)]
+#![allow(clippy::needless_return)]
 use crate::expr::{BinaryOp, Expr, Literal, UnaryOp};
 use crate::parse_error::ParseError;
 use crate::token::token;
