@@ -3,6 +3,7 @@ pub enum Expr {
     Unary(UnaryOp, Box<Expr>),
     Literal(Literal),
     Binary(Box<Expr>, BinaryOp, Box<Expr>),
+    Grouping(Box<Expr>),
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -27,6 +28,7 @@ pub enum UnaryOp {
 
 #[derive(Debug, Clone)]
 pub enum Literal {
+    Str(String),
     Number(f64),
     Nil,
     False,
