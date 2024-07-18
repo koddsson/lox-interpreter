@@ -51,8 +51,8 @@ pub enum TokenType {
     EOF,
 }
 
-impl<'a> fmt::Display for TokenType {
+impl fmt::Display for TokenType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.to_string().to_ascii_uppercase())
+        write!(f, "{}", format!("{:?}", self).to_ascii_uppercase())
     }
 }
