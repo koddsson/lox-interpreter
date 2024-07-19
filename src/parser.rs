@@ -20,9 +20,18 @@ impl<'a> Parser<'a> {
         return self.equality();
     }
 
+    fn match_equality_token(&mut self) -> bool {
+        if self.check(TokenType::BangEqual) || self.check(TokenType::BangEqual) {
+            self.advance();
+            return true;
+        }
+
+        return false;
+    }
+
     fn equality(&mut self) -> Result<Expr, ParseError> {
         let mut expr = self.comparison()?;
-        while self.match_types(vec![TokenType::BangEqual, TokenType::EqualEqual]) {
+        while self.match_equality_token() {
             let operator = self.previous();
             let maybe_binary_operator = Parser::token_to_binary_operator(operator);
 
@@ -39,15 +48,23 @@ impl<'a> Parser<'a> {
         return Ok(expr);
     }
 
+    fn match_comparision_token(&mut self) -> bool {
+        if self.check(TokenType::Greater)
+            || self.check(TokenType::GreaterEqual)
+            || self.check(TokenType::Less)
+            || self.check(TokenType::LessEqual)
+        {
+            self.advance();
+            return true;
+        }
+
+        return false;
+    }
+
     fn comparison(&mut self) -> Result<Expr, ParseError> {
         let mut expr = self.term()?;
 
-        while self.match_types(vec![
-            TokenType::Greater,
-            TokenType::GreaterEqual,
-            TokenType::Less,
-            TokenType::LessEqual,
-        ]) {
+        while self.match_comparision_token() {
             let operator = self.previous();
             let maybe_binary_operator = Parser::token_to_binary_operator(operator);
 
@@ -64,10 +81,19 @@ impl<'a> Parser<'a> {
         return Ok(expr);
     }
 
+    fn match_term_token(&mut self) -> bool {
+        if self.check(TokenType::Minus) || self.check(TokenType::Plus) {
+            self.advance();
+            return true;
+        }
+
+        return false;
+    }
+
     fn term(&mut self) -> Result<Expr, ParseError> {
         let mut expr = self.factor()?;
 
-        while self.match_types(vec![TokenType::Minus, TokenType::Plus]) {
+        while self.match_term_token() {
             let operator = self.previous();
             let maybe_binary_operator = Parser::token_to_binary_operator(operator);
 
@@ -84,10 +110,19 @@ impl<'a> Parser<'a> {
         return Ok(expr);
     }
 
+    fn match_factor_token(&mut self) -> bool {
+        if self.check(TokenType::Slash) || self.check(TokenType::Star) {
+            self.advance();
+            return true;
+        }
+
+        return false;
+    }
+
     fn factor(&mut self) -> Result<Expr, ParseError> {
         let mut expr = self.unary()?;
 
-        while self.match_types(vec![TokenType::Slash, TokenType::Star]) {
+        while self.match_factor_token() {
             let operator = self.previous();
             let maybe_binary_operator = Parser::token_to_binary_operator(operator);
             let right = self.unary()?;
@@ -103,8 +138,17 @@ impl<'a> Parser<'a> {
         return Ok(expr);
     }
 
+    fn match_unary_token(&mut self) -> bool {
+        if self.check(TokenType::Bang) || self.check(TokenType::Minus) {
+            self.advance();
+            return true;
+        }
+
+        return false;
+    }
+
     fn unary(&mut self) -> Result<Expr, ParseError> {
-        if self.match_types(vec![TokenType::Bang, TokenType::Minus]) {
+        if self.match_unary_token() {
             let operator = self.previous();
             let maybe_binary_operator = Parser::token_to_unary_operator(operator);
 
@@ -119,18 +163,36 @@ impl<'a> Parser<'a> {
         return self.primary();
     }
 
+    fn match_token_type(&mut self, token_type: TokenType) -> bool {
+        if self.check(token_type) {
+            self.advance();
+            return true;
+        }
+
+        return false;
+    }
+
+    fn match_literal_token_type(&mut self) -> bool {
+        if self.check(TokenType::Number) || self.check(TokenType::String) {
+            self.advance();
+            return true;
+        }
+
+        return false;
+    }
+
     fn primary(&mut self) -> Result<Expr, ParseError> {
-        if self.match_types(vec![TokenType::False]) {
+        if self.match_token_type(TokenType::False) {
             return Ok(Expr::Literal(Literal::False));
         }
-        if self.match_types(vec![TokenType::True]) {
+        if self.match_token_type(TokenType::True) {
             return Ok(Expr::Literal(Literal::True));
         }
-        if self.match_types(vec![TokenType::Nil]) {
+        if self.match_token_type(TokenType::Nil) {
             return Ok(Expr::Literal(Literal::Nil));
         }
 
-        if self.match_types(vec![TokenType::Number, TokenType::String]) {
+        if self.match_literal_token_type() {
             match &self.previous().literal {
                 Some(token::Literal::Number(n)) => return Ok(Expr::Literal(Literal::Number(*n))),
                 Some(token::Literal::Str(string)) => {
@@ -140,7 +202,7 @@ impl<'a> Parser<'a> {
                 None => panic!("Failed to parse number"),
             }
         }
-        if self.match_types(vec![TokenType::LeftParen]) {
+        if self.match_token_type(TokenType::LeftParen) {
             let expr = Box::new(self.expression()?);
             return match self.consume(TokenType::RightParen, "Expect ')' after expression.") {
                 Ok(()) => Ok(Expr::Grouping(expr)),
@@ -209,17 +271,6 @@ impl<'a> Parser<'a> {
 
         eprintln!("{}", message);
         return Err(ParseError::UnexpectedTokenError(self.peek().token_type));
-    }
-
-    fn match_types(&mut self, types: Vec<TokenType>) -> bool {
-        for token_type in types {
-            if self.check(token_type) {
-                self.advance();
-                return true;
-            }
-        }
-
-        return false;
     }
 
     fn check(&self, token_type: TokenType) -> bool {
