@@ -21,7 +21,7 @@ impl<'a> Parser<'a> {
     }
 
     fn match_equality_token(&mut self) -> bool {
-        if self.check(TokenType::BangEqual) || self.check(TokenType::BangEqual) {
+        if self.check(TokenType::BangEqual) || self.check(TokenType::EqualEqual) {
             self.advance();
             return true;
         }
