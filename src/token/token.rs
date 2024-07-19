@@ -13,7 +13,13 @@ impl<'a> fmt::Display for Literal {
         let message = match self {
             Literal::Identifier(id) => format!("{}", id),
             Literal::Str(str) => format!("{}", str),
-            Literal::Number(n) => format!("{:.1}", n),
+            Literal::Number(n) => {
+                if n.fract() == 0.0 {
+                    format!("{}.0", n)
+                } else {
+                    format!("{:.}", n)
+                }
+            }
         };
         write!(f, "{}", message)
     }
