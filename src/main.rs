@@ -48,21 +48,20 @@ fn main() -> ExitCode {
             };
 
             let results = scanner.scan_tokens();
+            if results != 0 {
+                return ExitCode::from(results);
+            }
 
             let mut parser = Parser {
                 tokens: scanner.tokens,
                 ..Default::default()
             };
 
-            if results != 0 {
-                return ExitCode::from(results);
-            }
-
             let expression = match parser.parse() {
                 Ok(expression) => expression,
                 Err(err) => {
                     eprintln!("{}", err);
-                    return ExitCode::FAILURE;
+                    return ExitCode::from(65);
                 }
             };
 
