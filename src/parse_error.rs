@@ -1,9 +1,17 @@
 use std::fmt;
 
-pub struct ParseError {}
+use crate::token::token_type::TokenType;
+
+pub enum ParseError {
+    UnexpectedTokenError(TokenType),
+}
 
 impl fmt::Display for ParseError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "A parse error occured!")
+        return match self {
+            Self::UnexpectedTokenError(token_type) => {
+                write!(f, "Parse Error: Unexpected token: {}", token_type)
+            }
+        };
     }
 }

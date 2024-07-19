@@ -142,11 +142,11 @@ impl<'a> Parser<'a> {
         }
         if self.match_types(vec![TokenType::LeftParen]) {
             let expr = Box::new(self.expression()?);
-            self.consume(TokenType::RightParen, "Expect ')' after expression.");
+            let _ = self.consume(TokenType::RightParen, "Expect ')' after expression.");
             return Ok(Expr::Grouping(expr));
         }
 
-        Err(ParseError {})
+        Err(ParseError::UnexpectedTokenError(self.peek().token_type))
     }
 
     fn synchronize(mut self) {
@@ -187,7 +187,7 @@ impl<'a> Parser<'a> {
             TokenType::LessEqual => Ok(BinaryOp::LessEqual),
             TokenType::Greater => Ok(BinaryOp::Greater),
             TokenType::GreaterEqual => Ok(BinaryOp::GreaterEqual),
-            _ => Err(ParseError {}),
+            _ => Err(ParseError::UnexpectedTokenError(token.token_type)),
         }
     }
 
@@ -195,7 +195,7 @@ impl<'a> Parser<'a> {
         match token.token_type {
             TokenType::Minus => Ok(UnaryOp::Minus),
             TokenType::Bang => Ok(UnaryOp::Bang),
-            _ => Err(ParseError {}),
+            _ => Err(ParseError::UnexpectedTokenError(token.token_type)),
         }
     }
 
@@ -204,7 +204,7 @@ impl<'a> Parser<'a> {
             return Ok(self.advance());
         }
 
-        return Err(ParseError {});
+        return Err(ParseError::UnexpectedTokenError(token_type));
     }
 
     fn match_types(&mut self, types: Vec<TokenType>) -> bool {
