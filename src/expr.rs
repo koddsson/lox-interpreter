@@ -13,7 +13,7 @@ impl<'a> fmt::Display for Expr {
         let message = match self {
             Expr::Unary(operator, expression) => format!("({} {})", operator, expression),
             Expr::Literal(lit) => format!("{}", lit),
-            Expr::Binary(left, operator, right) => format!("{} {} {}", left, operator, right),
+            Expr::Binary(left, operator, right) => format!("({} {} {})", operator, left, right),
             Expr::Grouping(expression) => format!("(group {})", expression),
         };
         write!(f, "{}", message)
@@ -37,16 +37,16 @@ pub enum BinaryOp {
 impl<'a> fmt::Display for BinaryOp {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let message = match self {
-            BinaryOp::Plus => "PLUS",
-            BinaryOp::Minus => "MINUS",
-            BinaryOp::Star => "STAR",
-            BinaryOp::Slash => "SLASH",
-            BinaryOp::EqualEqual => "EQUAL_EQUAL",
-            BinaryOp::BangEqual => "BANG_EQUAL",
-            BinaryOp::Less => "LESS",
-            BinaryOp::LessEqual => "LESS_EQUAL",
-            BinaryOp::Greater => "GREATER",
-            BinaryOp::GreaterEqual => "GREATER_EQUAL",
+            BinaryOp::Plus => "+",
+            BinaryOp::Minus => "-",
+            BinaryOp::Star => "*",
+            BinaryOp::Slash => "/",
+            BinaryOp::EqualEqual => "==",
+            BinaryOp::BangEqual => "!=",
+            BinaryOp::Less => "<",
+            BinaryOp::LessEqual => "<=",
+            BinaryOp::Greater => ">",
+            BinaryOp::GreaterEqual => ">=",
         };
 
         write!(f, "{}", message)
