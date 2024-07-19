@@ -3,7 +3,7 @@ use std::fmt;
 
 #[derive(Debug, Clone)]
 pub enum Literal<'a> {
-    Identifier(String),
+    Identifier(&'a str),
     Str(&'a str),
     Number(f64),
 }
