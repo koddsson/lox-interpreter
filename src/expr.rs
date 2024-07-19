@@ -8,7 +8,7 @@ pub enum Expr {
     Grouping(Box<Expr>),
 }
 
-impl<'a> fmt::Display for Expr {
+impl fmt::Display for Expr {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let message = match self {
             Expr::Unary(operator, expression) => format!("({} {})", operator, expression),
@@ -34,7 +34,7 @@ pub enum BinaryOp {
     GreaterEqual,
 }
 
-impl<'a> fmt::Display for BinaryOp {
+impl fmt::Display for BinaryOp {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let message = match self {
             BinaryOp::Plus => "+",
@@ -59,7 +59,7 @@ pub enum UnaryOp {
     Bang,
 }
 
-impl<'a> fmt::Display for UnaryOp {
+impl fmt::Display for UnaryOp {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         return match self {
             UnaryOp::Minus => write!(f, "-"),
@@ -77,7 +77,7 @@ pub enum Literal {
     True,
 }
 
-impl<'a> fmt::Display for Literal {
+impl fmt::Display for Literal {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let message = match self {
             Literal::Str(str) => format!("{}", str),

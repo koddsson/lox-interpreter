@@ -8,7 +8,7 @@ pub enum Literal {
     Number(f64),
 }
 
-impl<'a> fmt::Display for Literal {
+impl fmt::Display for Literal {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let message = match self {
             Literal::Identifier(id) => format!("{}", id),
