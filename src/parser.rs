@@ -204,7 +204,7 @@ impl<'a> Parser<'a> {
             return Ok(self.advance());
         }
 
-        return Err(ParseError::UnexpectedTokenError(token_type));
+        return Err(ParseError::UnexpectedTokenError(self.peek().token_type));
     }
 
     fn match_types(&mut self, types: Vec<TokenType>) -> bool {
