@@ -142,8 +142,10 @@ impl<'a> Parser<'a> {
         }
         if self.match_types(vec![TokenType::LeftParen]) {
             let expr = Box::new(self.expression()?);
-            let _ = self.consume(TokenType::RightParen, "Expect ')' after expression.");
-            return Ok(Expr::Grouping(expr));
+            return match self.consume(TokenType::RightParen, "Expect ')' after expression.") {
+                Ok(()) => Ok(Expr::Grouping(expr)),
+                Err(err) => Err(err),
+            };
         }
 
         Err(ParseError::UnexpectedTokenError(self.peek().token_type))
@@ -199,9 +201,10 @@ impl<'a> Parser<'a> {
         }
     }
 
-    fn consume(&mut self, token_type: TokenType, message: &str) -> Result<&Token, ParseError> {
+    fn consume(&mut self, token_type: TokenType, message: &str) -> Result<(), ParseError> {
         if self.check(token_type) {
-            return Ok(self.advance());
+            self.advance();
+            return Ok(());
         }
 
         return Err(ParseError::UnexpectedTokenError(self.peek().token_type));
