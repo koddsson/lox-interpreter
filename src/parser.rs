@@ -136,7 +136,7 @@ impl<'a> Parser<'a> {
                 Some(token::Literal::Str(string)) => {
                     return Ok(Expr::Literal(Literal::Str(string.clone())));
                 }
-                Some(other) => panic!("Failed to parse number"),
+                Some(other) => panic!("Failed to parse expected number: {}", other),
                 None => panic!("Failed to parse number"),
             }
         }
@@ -207,6 +207,7 @@ impl<'a> Parser<'a> {
             return Ok(());
         }
 
+        eprintln!("{}", message);
         return Err(ParseError::UnexpectedTokenError(self.peek().token_type));
     }
 
