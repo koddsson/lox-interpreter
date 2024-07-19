@@ -14,7 +14,7 @@ impl<'a> fmt::Display for Expr {
             Expr::Unary(operator, expression) => format!("{:?} {}", operator, expression),
             Expr::Literal(lit) => format!("{}", lit),
             Expr::Binary(left, operator, right) => format!("{} {} {}", left, operator, right),
-            Expr::Grouping(expression) => format!("{}", expression),
+            Expr::Grouping(expression) => format!("(group {})", expression),
         };
         write!(f, "{}", message)
     }
