@@ -11,7 +11,7 @@ pub enum Expr {
 impl<'a> fmt::Display for Expr {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let message = match self {
-            Expr::Unary(operator, expression) => format!("{:?} {}", operator, expression),
+            Expr::Unary(operator, expression) => format!("({} {})", operator, expression),
             Expr::Literal(lit) => format!("{}", lit),
             Expr::Binary(left, operator, right) => format!("{} {} {}", left, operator, right),
             Expr::Grouping(expression) => format!("(group {})", expression),
@@ -57,6 +57,15 @@ impl<'a> fmt::Display for BinaryOp {
 pub enum UnaryOp {
     Minus,
     Bang,
+}
+
+impl<'a> fmt::Display for UnaryOp {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        return match self {
+            UnaryOp::Minus => write!(f, "-"),
+            UnaryOp::Bang => write!(f, "!"),
+        };
+    }
 }
 
 #[derive(Debug, Clone)]
