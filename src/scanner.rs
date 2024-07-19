@@ -124,8 +124,12 @@ impl<'a> Scanner<'a> {
         self.advance();
 
         // Trim the surrounding quotes.
-        let value = self.source.get(self.start + 1..self.current - 1).unwrap();
-        self.add_token(TokenType::String, Some(Literal::Str(String::from(value))));
+        let value = self
+            .source
+            .get(self.start + 1..self.current - 1)
+            .unwrap()
+            .to_string();
+        self.add_token(TokenType::String, Some(Literal::Str(value)));
     }
 
     fn is_digit(&self, c: Option<char>) -> bool {

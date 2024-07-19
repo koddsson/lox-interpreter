@@ -130,9 +130,12 @@ impl<'a> Parser<'a> {
             return Ok(Expr::Literal(Literal::Nil));
         }
 
-        if self.match_types(vec![TokenType::Number]) {
+        if self.match_types(vec![TokenType::Number, TokenType::String]) {
             match &self.previous().literal {
                 Some(token::Literal::Number(n)) => return Ok(Expr::Literal(Literal::Number(*n))),
+                Some(token::Literal::Str(string)) => {
+                    return Ok(Expr::Literal(Literal::Str(string.clone())));
+                }
                 Some(other) => panic!("Failed to parse number"),
                 None => panic!("Failed to parse number"),
             }
