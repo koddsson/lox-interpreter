@@ -72,7 +72,13 @@ impl<'a> fmt::Display for Literal {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let message = match self {
             Literal::Str(str) => format!("{}", str),
-            Literal::Number(n) => format!("{}", n),
+            Literal::Number(n) => {
+                if n.fract() == 0.0 {
+                    format!("{}.0", n)
+                } else {
+                    format!("{:.}", n)
+                }
+            }
             Literal::Nil => format!("nil"),
             Literal::False => format!("false"),
             Literal::True => format!("true"),
