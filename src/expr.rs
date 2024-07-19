@@ -80,7 +80,7 @@ pub enum Literal {
 impl fmt::Display for Literal {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let message = match self {
-            Literal::Str(str) => format!("{}", str),
+            Literal::Str(str) => str.to_string(),
             Literal::Number(n) => {
                 if n.fract() == 0.0 {
                     format!("{}.0", n)
@@ -88,9 +88,9 @@ impl fmt::Display for Literal {
                     format!("{:.}", n)
                 }
             }
-            Literal::Nil => format!("nil"),
-            Literal::False => format!("false"),
-            Literal::True => format!("true"),
+            Literal::Nil => "nil".to_string(),
+            Literal::False => "false".to_string(),
+            Literal::True => "true".to_string(),
         };
         write!(f, "{}", message)
     }

@@ -11,8 +11,8 @@ pub enum Literal {
 impl fmt::Display for Literal {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let message = match self {
-            Literal::Identifier(id) => format!("{}", id),
-            Literal::Str(str) => format!("{}", str),
+            Literal::Identifier(id) => id.to_string(),
+            Literal::Str(str) => str.to_string(),
             Literal::Number(n) => {
                 if n.fract() == 0.0 {
                     format!("{}.0", n)
