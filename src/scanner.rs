@@ -85,7 +85,7 @@ impl<'a> Scanner<'a> {
         return char;
     }
 
-    fn add_token(&mut self, token_type: TokenType, literal: Option<Literal>) {
+    fn add_token(&mut self, token_type: TokenType, literal: Option<Literal<'a>>) {
         let lexeme = self.source.get(self.start..self.current).unwrap();
         self.tokens.push(Token {
             token_type,
@@ -124,11 +124,7 @@ impl<'a> Scanner<'a> {
         self.advance();
 
         // Trim the surrounding quotes.
-        let value = self
-            .source
-            .get(self.start + 1..self.current - 1)
-            .unwrap()
-            .to_string();
+        let value = self.source.get(self.start + 1..self.current - 1).unwrap();
         self.add_token(TokenType::String, Some(Literal::Str(value)));
     }
 

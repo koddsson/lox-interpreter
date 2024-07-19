@@ -2,13 +2,13 @@ use crate::token::token_type;
 use std::fmt;
 
 #[derive(Debug, Clone)]
-pub enum Literal {
+pub enum Literal<'a> {
     Identifier(String),
-    Str(String),
+    Str(&'a str),
     Number(f64),
 }
 
-impl fmt::Display for Literal {
+impl<'a> fmt::Display for Literal<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let message = match self {
             Literal::Identifier(id) => id.to_string(),
@@ -29,7 +29,7 @@ impl fmt::Display for Literal {
 pub struct Token<'a> {
     pub token_type: token_type::TokenType,
     pub lexeme: &'a str,
-    pub literal: Option<Literal>,
+    pub literal: Option<Literal<'a>>,
     pub line: usize,
 }
 

@@ -196,7 +196,7 @@ impl<'a> Parser<'a> {
             match &self.previous().literal {
                 Some(token::Literal::Number(n)) => return Ok(Expr::Literal(Literal::Number(*n))),
                 Some(token::Literal::Str(string)) => {
-                    return Ok(Expr::Literal(Literal::Str(string.clone())));
+                    return Ok(Expr::Literal(Literal::Str(string.to_string())));
                 }
                 Some(other) => panic!("Failed to parse expected number: {}", other),
                 None => panic!("Failed to parse number"),
