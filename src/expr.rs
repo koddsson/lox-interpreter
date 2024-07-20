@@ -70,6 +70,7 @@ impl fmt::Display for UnaryOp {
 
 #[derive(Debug, Clone)]
 pub enum Literal {
+    // TODO: Convert this to a `&'a str`. See https://github.com/koddsson/codecrafters-interpreter-rust/pull/1#discussion_r1684154612
     Str(String),
     Number(f64),
     Nil,
