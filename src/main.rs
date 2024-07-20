@@ -4,13 +4,13 @@ use std::fs;
 use std::process::ExitCode;
 
 use crate::parser::Parser;
-use crate::scanner::Scanner;
+use crate::tokenizer::Tokenizer;
 
 mod expr;
 mod parse_error;
 mod parser;
-mod scanner;
 mod token;
+mod tokenizer;
 
 fn main() -> ExitCode {
     let args: Vec<String> = env::args().collect();
@@ -29,31 +29,31 @@ fn main() -> ExitCode {
 
     match command.as_str() {
         "tokenize" => {
-            let mut scanner = Scanner {
+            let mut tokenizer = Tokenizer {
                 source: source.as_str(),
                 ..Default::default()
             };
 
-            let results = scanner.scan_tokens();
-            for token in scanner.tokens {
+            let results = tokenizer.scan_tokens();
+            for token in tokenizer.tokens {
                 println!("{}", token);
             }
 
             return ExitCode::from(results);
         }
         "parse" => {
-            let mut scanner = Scanner {
+            let mut tokenizer = Tokenizer {
                 source: source.as_str(),
                 ..Default::default()
             };
 
-            let results = scanner.scan_tokens();
+            let results = tokenizer.scan_tokens();
             if results != 0 {
                 return ExitCode::from(results);
             }
 
             let mut parser = Parser {
-                tokens: scanner.tokens,
+                tokens: tokenizer.tokens,
                 ..Default::default()
             };
 

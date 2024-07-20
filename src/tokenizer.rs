@@ -4,7 +4,7 @@ use crate::token::token::Literal;
 use crate::token::token::Token;
 use crate::token::token_type::TokenType;
 
-pub struct Scanner<'a> {
+pub struct Tokenizer<'a> {
     pub source: &'a str,
     pub line: usize,
     pub current: usize,
@@ -14,9 +14,9 @@ pub struct Scanner<'a> {
     pub keywords: HashMap<&'a str, TokenType>,
 }
 
-impl<'a> Default for Scanner<'a> {
-    fn default() -> Scanner<'a> {
-        Scanner {
+impl<'a> Default for Tokenizer<'a> {
+    fn default() -> Tokenizer<'a> {
+        Tokenizer {
             source: "",
             line: 1,
             current: 0,
@@ -45,7 +45,7 @@ impl<'a> Default for Scanner<'a> {
     }
 }
 
-impl<'a> Scanner<'a> {
+impl<'a> Tokenizer<'a> {
     fn is_at_end(&self) -> bool {
         return self.current >= self.source.chars().count();
     }
