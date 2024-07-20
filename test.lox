@@ -1,1 +1,1 @@
-foo bar _hello
+var duck = Duck("Waddles");
