@@ -95,7 +95,7 @@ fn main() -> ExitCode {
                 }
             };
 
-            let value = match interpret(expression) {
+            let value = match interpret(&expression) {
                 Ok(value) => value,
                 Err(err) => {
                     eprintln!("{}", err);
