@@ -1,7 +1,9 @@
 use core::fmt;
 
 use crate::expr::{BinaryOp, Expr, Literal, UnaryOp};
+use crate::statement::Statement;
 
+#[derive(Debug)]
 pub enum Error<'a> {
     RuntimeError(&'a str),
 }
@@ -14,15 +16,26 @@ impl<'a> fmt::Display for Error<'a> {
     }
 }
 
-pub fn interpret<'a>(expression: &Expr) -> Result<String, Error<'a>> {
-    return match evaluate(expression) {
-        Ok(value) => Ok(value.to_string()),
-        Err(err) => Err(err),
-    };
+pub fn interpret<'a>(statements: Vec<Statement>) {
+    for statement in statements {
+        execute(statement)
+    }
+}
+
+fn execute<'a>(statement: Statement) {
+    match statement {
+        Statement::Print(expression) => {
+            let value = evaluate(&expression).unwrap();
+            println!("{}", value);
+        }
+        Statement::Expression(expression) => {
+            let _ = evaluate(&expression);
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
-enum Value {
+pub enum Value {
     Number(f64),
     String(String),
     Bool(bool),
@@ -32,7 +45,7 @@ enum Value {
 impl fmt::Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Value::String(str) => write!(f, "{}", str),
+            Value::String(str) => write!(f, "\"{}\"", str),
             Value::Number(n) => write!(f, "{}", n),
             Value::Bool(bool) => write!(f, "{}", bool),
             Value::Nil => write!(f, "nil"),
@@ -87,7 +100,7 @@ fn interpret_binary<'a>(
     };
 }
 
-fn evaluate<'a>(expr: &Expr) -> Result<Value, Error<'a>> {
+pub fn evaluate<'a>(expr: &Expr) -> Result<Value, Error<'a>> {
     return match expr {
         Expr::Literal(literal) => Ok(expression_literal_to_value(literal)),
         Expr::Grouping(expr) => evaluate(expr),

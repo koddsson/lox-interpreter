@@ -1,6 +1,7 @@
 #![allow(clippy::needless_return)]
 use crate::expr::{BinaryOp, Expr, Literal, UnaryOp};
 use crate::parse_error::ParseError;
+use crate::statement::Statement;
 use crate::token::token;
 use crate::token::token::Token;
 use crate::token::token_type::TokenType;
@@ -12,8 +13,41 @@ pub struct Parser<'a> {
 }
 
 impl<'a> Parser<'a> {
-    pub fn parse(&mut self) -> Result<Expr, ParseError> {
-        return self.expression();
+    pub fn parse(&mut self) -> Result<Vec<Statement>, ParseError> {
+        let mut statements = Vec::new();
+        while (!self.is_at_end()) {
+            statements.push(self.statement()?);
+        }
+        return Ok(statements);
+    }
+
+    fn statement(&mut self) -> Result<Statement, ParseError> {
+        if self.match_print_token() {
+            return self.print_statement();
+        }
+
+        return self.expression_statement();
+    }
+
+    fn expression_statement(&mut self) -> Result<Statement, ParseError> {
+        let expr = self.expression()?;
+        self.consume(TokenType::Semicolon, "Expect ';' after expression.")?;
+        return Ok(Statement::Expression(expr));
+    }
+
+    fn print_statement(&mut self) -> Result<Statement, ParseError> {
+        let value = self.expression()?;
+        self.consume(TokenType::Semicolon, "Expect ';' after value.")?;
+        return Ok(Statement::Print(value));
+    }
+
+    fn match_print_token(&mut self) -> bool {
+        if self.check(TokenType::Print) {
+            self.advance();
+            return true;
+        }
+
+        return false;
     }
 
     fn expression(&mut self) -> Result<Expr, ParseError> {

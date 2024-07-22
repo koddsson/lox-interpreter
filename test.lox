@@ -1,1 +1,4 @@
-2 + 3
+print "one";
+2 + 1;
+print true;
+print 2 + 1;

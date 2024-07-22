@@ -11,6 +11,7 @@ mod expr;
 mod interpreter;
 mod parse_error;
 mod parser;
+mod statement;
 mod token;
 mod tokenizer;
 
@@ -59,15 +60,17 @@ fn main() -> ExitCode {
                 ..Default::default()
             };
 
-            let expression = match parser.parse() {
-                Ok(expression) => expression,
+            let expressions = match parser.parse() {
+                Ok(expressions) => expressions,
                 Err(err) => {
                     eprintln!("{}", err);
                     return ExitCode::from(65);
                 }
             };
 
-            println!("{}", expression);
+            for expression in expressions {
+                println!("{}", expression);
+            }
 
             return ExitCode::from(results);
         }
@@ -87,23 +90,15 @@ fn main() -> ExitCode {
                 ..Default::default()
             };
 
-            let expression = match parser.parse() {
-                Ok(expression) => expression,
+            let statements = match parser.parse() {
+                Ok(statements) => statements,
                 Err(err) => {
                     eprintln!("{}", err);
                     return ExitCode::from(65);
                 }
             };
 
-            let value = match interpret(&expression) {
-                Ok(value) => value,
-                Err(err) => {
-                    eprintln!("{}", err);
-                    return ExitCode::from(70);
-                }
-            };
-
-            println!("{}", value);
+            interpret(statements);
 
             return ExitCode::from(results);
         }
