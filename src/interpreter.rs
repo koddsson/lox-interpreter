@@ -53,7 +53,7 @@ fn expression_literal_to_value(literal: &Literal) -> Value {
 fn is_truthy(value: &Value) -> bool {
     match value {
         Value::Number(n) => *n > 0.0,
-        Value::String(str) => str.len() > 0,
+        Value::String(str) => !str.is_empty(),
         Value::Nil => false,
         Value::Bool(bool) => *bool,
     }
