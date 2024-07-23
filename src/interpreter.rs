@@ -1,20 +1,27 @@
 use core::fmt;
+use std::collections::HashMap;
 
+use crate::environment::Environment;
 use crate::expr::{BinaryOp, Expr, Literal, UnaryOp};
 use crate::statement::Statement;
+use crate::value::Value;
 
 #[derive(Debug)]
-pub enum Error<'a> {
-    RuntimeError(&'a str),
+pub enum Error {
+    RuntimeError(String),
 }
 
-impl<'a> fmt::Display for Error<'a> {
+impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Error::RuntimeError(message) => write!(f, "{}", message),
         }
     }
 }
+
+static ENVIRONMENT: Environment = Environment {
+    values: HashMap::new(),
+};
 
 pub fn interpret<'a>(statements: Vec<Statement>) {
     for statement in statements {
@@ -31,28 +38,11 @@ fn execute<'a>(statement: Statement) {
         Statement::Expression(expression) => {
             let _ = evaluate(&expression);
         }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub enum Value {
-    Number(f64),
-    String(String),
-    Bool(bool),
-    Nil,
-}
-
-impl fmt::Display for Value {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Value::String(str) => write!(f, "\"{}\"", str),
-            Value::Number(n) => write!(f, "{}", n),
-            Value::Bool(bool) => write!(f, "{}", bool),
-            Value::Nil => write!(f, "nil"),
+        Statement::Var(token, maybe_expression) => {
+            todo!()
         }
     }
 }
-
 fn expression_literal_to_value<'a>(literal: &Literal) -> Value {
     match literal {
         Literal::Number(n) => Value::Number(*n),
@@ -72,12 +62,12 @@ fn is_truthy(value: &Value) -> bool {
     }
 }
 
-fn interpret_unary<'a>(operator: UnaryOp, expression: &Expr) -> Result<Value, Error<'a>> {
+fn interpret_unary<'a>(operator: UnaryOp, expression: &Expr) -> Result<Value, Error> {
     let value = evaluate(expression)?;
     match (operator, &value) {
         (UnaryOp::Minus, Value::Number(n)) => Ok(Value::Number(-n)),
         (UnaryOp::Bang, _) => Ok(Value::Bool(!is_truthy(&value))),
-        _ => Err(Error::RuntimeError("Unexpected runtime error!")),
+        _ => Err(Error::RuntimeError("Unexpected runtime error!".to_string())),
     }
 }
 
@@ -85,7 +75,7 @@ fn interpret_binary<'a>(
     left_expression: &Expr,
     operator: BinaryOp,
     right_expression: &Expr,
-) -> Result<Value, Error<'a>> {
+) -> Result<Value, Error> {
     let left = evaluate(left_expression)?;
     let right = evaluate(right_expression)?;
 
@@ -95,16 +85,22 @@ fn interpret_binary<'a>(
         (Value::Number(n1), BinaryOp::Plus, Value::Number(n2)) => Ok(Value::Number(n1 + n2)),
         (Value::Number(n1), BinaryOp::Star, Value::Number(n2)) => Ok(Value::Number(n1 * n2)),
         _ => {
-            return Err(Error::RuntimeError("Runtime error in binary expression!"));
+            return Err(Error::RuntimeError(
+                "Runtime error in binary expression!".to_string(),
+            ));
         }
     };
 }
 
-pub fn evaluate<'a>(expr: &Expr) -> Result<Value, Error<'a>> {
+pub fn evaluate<'a>(expr: &Expr) -> Result<Value, Error> {
     return match expr {
         Expr::Literal(literal) => Ok(expression_literal_to_value(literal)),
         Expr::Grouping(expr) => evaluate(expr),
         Expr::Unary(operator, expression_right) => interpret_unary(*operator, expression_right),
+        Expr::Variable(token) => match ENVIRONMENT.get(token) {
+            Ok(x) => Ok(x.clone()),
+            Err(err) => Err(err),
+        },
         Expr::Binary(left_expression, operator, right_expression) => {
             interpret_binary(left_expression, *operator, right_expression)
         }

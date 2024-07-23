@@ -1,20 +1,24 @@
 use std::fmt;
 
+use crate::token::token::Token;
+
 #[derive(Debug, Clone)]
-pub enum Expr {
-    Unary(UnaryOp, Box<Expr>),
+pub enum Expr<'a> {
+    Unary(UnaryOp, Box<Expr<'a>>),
     Literal(Literal),
-    Binary(Box<Expr>, BinaryOp, Box<Expr>),
-    Grouping(Box<Expr>),
+    Binary(Box<Expr<'a>>, BinaryOp, Box<Expr<'a>>),
+    Grouping(Box<Expr<'a>>),
+    Variable(&'a Token<'a>),
 }
 
-impl fmt::Display for Expr {
+impl<'a> fmt::Display for Expr<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let message = match self {
             Expr::Unary(operator, expression) => format!("({} {})", operator, expression),
             Expr::Literal(lit) => format!("{}", lit),
             Expr::Binary(left, operator, right) => format!("({} {} {})", operator, left, right),
             Expr::Grouping(expression) => format!("(group {})", expression),
+            Expr::Variable(token) => format!("{}", token),
         };
         write!(f, "{}", message)
     }

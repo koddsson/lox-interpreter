@@ -2,6 +2,7 @@
 use crate::expr::{BinaryOp, Expr, Literal, UnaryOp};
 use crate::parse_error::ParseError;
 use crate::statement::Statement;
+use crate::symbol::Symbol;
 use crate::token::token;
 use crate::token::token::Token;
 use crate::token::token_type::TokenType;
@@ -15,10 +16,63 @@ pub struct Parser<'a> {
 impl<'a> Parser<'a> {
     pub fn parse(&mut self) -> Result<Vec<Statement>, ParseError> {
         let mut statements = Vec::new();
-        while (!self.is_at_end()) {
-            statements.push(self.statement()?);
+        while !self.is_at_end() {
+            let statement = self.declaration()?;
+            statements.push(statement);
         }
         return Ok(statements);
+    }
+
+    fn declaration(&mut self) -> Result<Statement, ParseError> {
+        if self.match_token_type(TokenType::Var) {
+            return self.var_declaration();
+        }
+
+        self.statement()
+    }
+
+    fn var_declaration(&mut self) -> Result<Statement, ParseError> {
+        let name = self
+            .consume(TokenType::Identifier, "Expect variable name.")?
+            .clone();
+
+        let maybe_initializer = if self.match_token_type(TokenType::Equal) {
+            Some(self.expression()?)
+        } else {
+            None
+        };
+
+        self.consume(
+            TokenType::Semicolon,
+            "Expect ';' after variable declaration.",
+        );
+
+        Ok(Statement::Var(
+            Symbol {
+                name: name.lexeme,
+                line: name.line,
+                col: 0,
+            },
+            maybe_initializer,
+        ))
+    }
+
+    fn match_equal_token(&mut self) -> bool {
+        if self.check(TokenType::Equal) {
+            self.advance();
+            return true;
+        }
+
+        return false;
+    }
+
+    fn match_declaration_token(&mut self) -> bool {
+        if self.check(TokenType::Var) {
+            self.advance();
+            return true;
+        }
+
+        return false;
     }
 
     fn statement(&mut self) -> Result<Statement, ParseError> {
@@ -236,10 +290,13 @@ impl<'a> Parser<'a> {
                 None => panic!("Failed to parse number"),
             }
         }
+        if self.match_token_type(TokenType::Identifier) {
+            return Ok(Expr::Variable(self.previous()));
+        }
         if self.match_token_type(TokenType::LeftParen) {
             let expr = Box::new(self.expression()?);
             return match self.consume(TokenType::RightParen, "Expect ')' after expression.") {
-                Ok(()) => Ok(Expr::Grouping(expr)),
+                Ok(_) => Ok(Expr::Grouping(expr)),
                 Err(err) => Err(err),
             };
         }
@@ -247,7 +304,7 @@ impl<'a> Parser<'a> {
         Err(ParseError::UnexpectedTokenError(self.peek().token_type))
     }
 
-    fn synchronize(mut self) {
+    fn synchronize(&mut self) {
         self.advance();
 
         while !self.is_at_end() {
@@ -297,10 +354,10 @@ impl<'a> Parser<'a> {
         }
     }
 
-    fn consume(&mut self, token_type: TokenType, message: &str) -> Result<(), ParseError> {
+    fn consume(&mut self, token_type: TokenType, message: &str) -> Result<&Token, ParseError> {
         if self.check(token_type) {
-            self.advance();
-            return Ok(());
+            let token = self.advance();
+            return Ok(token);
         }
 
         eprintln!("{}", message);
@@ -322,14 +379,14 @@ impl<'a> Parser<'a> {
     }
 
     fn is_at_end(&self) -> bool {
-        return self.peek().token_type == TokenType::EOF;
+        self.peek().token_type == TokenType::EOF
     }
 
     fn peek(&self) -> &Token {
-        return &self.tokens[self.current];
+        &self.tokens[self.current]
     }
 
-    fn previous(&mut self) -> &Token {
-        return &self.tokens[self.current - 1];
+    fn previous(&self) -> &Token {
+        &self.tokens[self.current - 1]
     }
 }
