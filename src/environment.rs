@@ -10,13 +10,14 @@ pub struct Environment {
 
 impl Environment {
     pub fn get(&self, name: &Token) -> Result<&Value, Error> {
-        if self.values.contains_key(name.lexeme) {
-            return Ok(self.values.get(name.lexeme).unwrap());
+        let key = String::from_utf8(name.lexeme.clone()).unwrap();
+        if self.values.contains_key(&key) {
+            return Ok(self.values.get(&key).unwrap());
         }
 
         Err(Error::RuntimeError(format!(
             "Undefined variable '{}'.",
-            name.lexeme
+            key
         )))
     }
 

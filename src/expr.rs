@@ -3,15 +3,15 @@ use std::fmt;
 use crate::token::token::Token;
 
 #[derive(Debug, Clone)]
-pub enum Expr<'a> {
-    Unary(UnaryOp, Box<Expr<'a>>),
+pub enum Expr {
+    Unary(UnaryOp, Box<Expr>),
     Literal(Literal),
-    Binary(Box<Expr<'a>>, BinaryOp, Box<Expr<'a>>),
-    Grouping(Box<Expr<'a>>),
-    Variable(&'a Token<'a>),
+    Binary(Box<Expr>, BinaryOp, Box<Expr>),
+    Grouping(Box<Expr>),
+    Variable(Token),
 }
 
-impl<'a> fmt::Display for Expr<'a> {
+impl fmt::Display for Expr {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let message = match self {
             Expr::Unary(operator, expression) => format!("({} {})", operator, expression),

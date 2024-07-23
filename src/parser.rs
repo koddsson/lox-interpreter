@@ -8,12 +8,12 @@ use crate::token::token::Token;
 use crate::token::token_type::TokenType;
 
 #[derive(Default)]
-pub struct Parser<'a> {
-    pub tokens: Vec<Token<'a>>,
+pub struct Parser {
+    pub tokens: Vec<Token>,
     pub current: usize,
 }
 
-impl<'a> Parser<'a> {
+impl Parser {
     pub fn parse(&mut self) -> Result<Vec<Statement>, ParseError> {
         let mut statements = Vec::new();
         while !self.is_at_end() {
@@ -330,7 +330,7 @@ impl<'a> Parser<'a> {
         }
     }
 
-    pub fn token_to_binary_operator(token: &'a Token) -> Result<BinaryOp, ParseError> {
+    pub fn token_to_binary_operator(token: &Token) -> Result<BinaryOp, ParseError> {
         match token.token_type {
             TokenType::Plus => Ok(BinaryOp::Plus),
             TokenType::Minus => Ok(BinaryOp::Minus),
@@ -346,7 +346,7 @@ impl<'a> Parser<'a> {
         }
     }
 
-    pub fn token_to_unary_operator(token: &'a Token) -> Result<UnaryOp, ParseError> {
+    pub fn token_to_unary_operator(token: &Token) -> Result<UnaryOp, ParseError> {
         match token.token_type {
             TokenType::Minus => Ok(UnaryOp::Minus),
             TokenType::Bang => Ok(UnaryOp::Bang),
