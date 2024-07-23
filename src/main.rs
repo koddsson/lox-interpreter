@@ -3,10 +3,12 @@ use std::env;
 use std::fs;
 use std::process::ExitCode;
 
+use crate::interpreter::interpret;
 use crate::parser::Parser;
 use crate::tokenizer::Tokenizer;
 
 mod expr;
+mod interpreter;
 mod parse_error;
 mod parser;
 mod token;
@@ -66,6 +68,42 @@ fn main() -> ExitCode {
             };
 
             println!("{}", expression);
+
+            return ExitCode::from(results);
+        }
+        "interpret" => {
+            let mut tokenizer = Tokenizer {
+                source: source.as_str(),
+                ..Default::default()
+            };
+
+            let results = tokenizer.scan_tokens();
+            if results != 0 {
+                return ExitCode::from(results);
+            }
+
+            let mut parser = Parser {
+                tokens: tokenizer.tokens,
+                ..Default::default()
+            };
+
+            let expression = match parser.parse() {
+                Ok(expression) => expression,
+                Err(err) => {
+                    eprintln!("{}", err);
+                    return ExitCode::from(65);
+                }
+            };
+
+            let value = match interpret(&expression) {
+                Ok(value) => value,
+                Err(err) => {
+                    eprintln!("{}", err);
+                    return ExitCode::from(70);
+                }
+            };
+
+            println!("{}", value);
 
             return ExitCode::from(results);
         }
