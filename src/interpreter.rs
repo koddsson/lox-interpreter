@@ -40,7 +40,7 @@ impl fmt::Display for Value {
     }
 }
 
-fn expression_literal_to_value<'a>(literal: &Literal) -> Value {
+fn expression_literal_to_value(literal: &Literal) -> Value {
     match literal {
         Literal::Number(n) => Value::Number(*n),
         Literal::Str(string) => Value::String(string.clone()),
