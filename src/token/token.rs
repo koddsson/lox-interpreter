@@ -2,13 +2,13 @@ use crate::token::token_type;
 use std::fmt;
 
 #[derive(Debug, Clone)]
-pub enum Literal<'a> {
-    Identifier(&'a str),
-    Str(&'a str),
+pub enum Literal {
+    Identifier(String),
+    Str(String),
     Number(f64),
 }
 
-impl<'a> fmt::Display for Literal<'a> {
+impl fmt::Display for Literal {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let message = match self {
             Literal::Identifier(id) => id.to_string(),
@@ -26,14 +26,14 @@ impl<'a> fmt::Display for Literal<'a> {
 }
 
 #[derive(Debug, Clone)]
-pub struct Token<'a> {
+pub struct Token {
     pub token_type: token_type::TokenType,
-    pub lexeme: &'a str,
-    pub literal: Option<Literal<'a>>,
+    pub lexeme: String,
+    pub literal: Option<Literal>,
     pub line: usize,
 }
 
-impl<'a> fmt::Display for Token<'a> {
+impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         return match &self.literal {
             Some(lit) => write!(f, "{} {} {}", self.token_type, self.lexeme, lit),

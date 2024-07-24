@@ -1,18 +1,67 @@
 #![allow(clippy::needless_return)]
+#![warn(clippy::integer_arithmetic)]
+
+use std::collections::HashMap;
 use std::env;
 use std::fs;
 use std::process::ExitCode;
 
-use crate::interpreter::interpret;
+use interpreter::Environment;
+
+use crate::interpreter::Interpreter;
 use crate::parser::Parser;
 use crate::tokenizer::Tokenizer;
 
 mod expr;
-mod interpreter;
+pub mod interpreter;
 mod parse_error;
 mod parser;
-mod token;
-mod tokenizer;
+mod statement;
+pub mod token;
+pub mod tokenizer;
+
+#[derive(Debug, PartialEq)]
+pub enum Error {
+    TokenizingError(String),
+    ParseError(String),
+    InterpreterError(String),
+}
+
+pub fn execute(source: &str) -> Result<Vec<String>, Error> {
+    let mut tokenizer = Tokenizer {
+        source,
+        ..Default::default()
+    };
+
+    let results = tokenizer.scan_tokens();
+    if results != 0 {
+        return Err(Error::TokenizingError("Failed parsing tokens".to_string()));
+    }
+
+    let mut parser = Parser {
+        tokens: tokenizer.tokens,
+        ..Default::default()
+    };
+
+    let statements = match parser.parse() {
+        Ok(statements) => statements,
+        Err(err) => {
+            return Err(Error::ParseError(err.to_string()));
+        }
+    };
+
+    let mut interpreter = Interpreter {
+        environment: Environment {
+            map: HashMap::new(),
+            enclosing: HashMap::new(),
+        },
+    };
+
+    match interpreter.interpret(statements) {
+        Ok(values) => Ok(values.into_iter().map(|value| value.to_string()).collect()),
+        Err(err) => return Err(Error::InterpreterError(err.to_string())),
+    }
+}
 
 fn main() -> ExitCode {
     let args: Vec<String> = env::args().collect();
@@ -59,15 +108,17 @@ fn main() -> ExitCode {
                 ..Default::default()
             };
 
-            let expression = match parser.parse() {
-                Ok(expression) => expression,
+            let statements = match parser.parse() {
+                Ok(statements) => statements,
                 Err(err) => {
                     eprintln!("{}", err);
                     return ExitCode::from(65);
                 }
             };
 
-            println!("{}", expression);
+            for statement in statements {
+                println!("{}", statement);
+            }
 
             return ExitCode::from(results);
         }
@@ -87,23 +138,28 @@ fn main() -> ExitCode {
                 ..Default::default()
             };
 
-            let expression = match parser.parse() {
-                Ok(expression) => expression,
+            let statements = match parser.parse() {
+                Ok(statements) => statements,
                 Err(err) => {
                     eprintln!("{}", err);
                     return ExitCode::from(65);
                 }
             };
 
-            let value = match interpret(&expression) {
+            let mut interpreter = Interpreter {
+                environment: Environment {
+                    map: HashMap::new(),
+                    enclosing: HashMap::new(),
+                },
+            };
+
+            match interpreter.interpret(statements) {
                 Ok(value) => value,
                 Err(err) => {
                     eprintln!("{}", err);
                     return ExitCode::from(70);
                 }
             };
-
-            println!("{}", value);
 
             return ExitCode::from(results);
         }
