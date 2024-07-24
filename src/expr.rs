@@ -1,11 +1,16 @@
 use std::fmt;
 
+use crate::token::token::Token;
+
 #[derive(Debug, Clone)]
 pub enum Expr {
     Unary(UnaryOp, Box<Expr>),
     Literal(Literal),
     Binary(Box<Expr>, BinaryOp, Box<Expr>),
     Grouping(Box<Expr>),
+    Variable(Token),
+    Assign(Token, Box<Expr>),
+    Logical(Box<Expr>, LogicalOp, Box<Expr>),
 }
 
 impl fmt::Display for Expr {
@@ -15,8 +20,26 @@ impl fmt::Display for Expr {
             Expr::Literal(lit) => format!("{}", lit),
             Expr::Binary(left, operator, right) => format!("({} {} {})", operator, left, right),
             Expr::Grouping(expression) => format!("(group {})", expression),
+            Expr::Variable(token) => format!("{}", token),
+            Expr::Assign(token, expression) => format!("{} {}", token, expression),
+            Expr::Logical(left, operator, right) => format!("{} {} {}", left, operator, right),
         };
         write!(f, "{}", message)
+    }
+}
+
+#[derive(Debug, Copy, Clone)]
+pub enum LogicalOp {
+    Or,
+    And,
+}
+
+impl fmt::Display for LogicalOp {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            LogicalOp::Or => write!(f, "||"),
+            LogicalOp::And => write!(f, "&&"),
+        }
     }
 }
 

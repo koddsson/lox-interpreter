@@ -9,7 +9,7 @@ pub struct Tokenizer<'a> {
     pub line: usize,
     pub current: usize,
     pub start: usize,
-    pub tokens: Vec<Token<'a>>,
+    pub tokens: Vec<Token>,
     pub exit_code: u8,
     pub keywords: HashMap<&'a str, TokenType>,
 }
@@ -59,7 +59,7 @@ impl<'a> Tokenizer<'a> {
 
         self.tokens.push(Token {
             token_type: TokenType::EOF,
-            lexeme: "",
+            lexeme: "".to_string(),
             literal: None,
             line: self.line,
         });
@@ -85,8 +85,12 @@ impl<'a> Tokenizer<'a> {
         return char;
     }
 
-    fn add_token(&mut self, token_type: TokenType, literal: Option<Literal<'a>>) {
-        let lexeme = self.source.get(self.start..self.current).unwrap();
+    fn add_token(&mut self, token_type: TokenType, literal: Option<Literal>) {
+        let lexeme = self
+            .source
+            .get(self.start..self.current)
+            .unwrap()
+            .to_string();
         self.tokens.push(Token {
             token_type,
             lexeme,
@@ -124,7 +128,11 @@ impl<'a> Tokenizer<'a> {
         self.advance();
 
         // Trim the surrounding quotes.
-        let value = self.source.get(self.start + 1..self.current - 1).unwrap();
+        let value = self
+            .source
+            .get(self.start + 1..self.current - 1)
+            .unwrap()
+            .to_string();
         self.add_token(TokenType::String, Some(Literal::Str(value)));
     }
 

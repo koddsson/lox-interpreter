@@ -2,6 +2,7 @@ use std::fmt;
 
 use crate::token::token_type::TokenType;
 
+#[derive(Debug)]
 pub enum ParseError {
     UnexpectedTokenError(TokenType),
 }
