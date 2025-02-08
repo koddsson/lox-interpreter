@@ -109,7 +109,7 @@ impl fmt::Display for Literal {
                 if n.fract() == 0.0 {
                     format!("{}.0", n)
                 } else {
-                    format!("{:.}", n)
+                    format!("{}", n)
                 }
             }
             Literal::Nil => "nil".to_string(),
